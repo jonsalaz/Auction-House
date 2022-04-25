@@ -1,0 +1,2 @@
+public class AuctionHouseApplication {
+}
