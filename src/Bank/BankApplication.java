@@ -1,32 +1,36 @@
 package Bank;
 
+import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
 public class BankApplication {
-    public static void main(String[] args) {
-        clientConnect();
 
+    private static BankManager bankManager;
+
+    public static void main(String[] args) {
+        bankManager = new BankManager();
+        clientConnect();
     }
 
     static void clientConnect() {
-        int port = 1234;
-        ServerSocket serverSocket;
-        Socket socket;
 
-        try {
-            serverSocket = new ServerSocket(port);
+            try {
 
-            while (true) {
-                socket = serverSocket.accept();
-                new ClientSocketContainer(socket).run();
+                while (true) {
 
+                    ServerSocket serverSocket = new ServerSocket(1234);
+                    System.out.println("Server waiting for connection");
+                    Socket clientSocket = serverSocket.accept();
+                    ClientManager clientManager = new ClientManager(clientSocket, bankManager);
+                    clientManager.run();
+
+                    serverSocket.close();
+                }
+
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-
 
     }
 
