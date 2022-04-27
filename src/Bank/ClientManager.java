@@ -24,14 +24,11 @@ public class ClientManager implements Runnable{
 
         try {
             clientQuery = dataFromClient.readUTF();
-        } catch (Exception e) {}
-        bankManager.printRequest(clientQuery);
-        try {
+            bankManager.handleClientRequest(clientQuery);
+
             System.out.println("close client socket.");
             socket.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        } catch (Exception e) {}
 
     }
 

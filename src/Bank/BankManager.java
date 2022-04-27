@@ -11,8 +11,7 @@ public class BankManager {
 
     public BankManager() {
     }
-
-
+    
     public void handleClientRequest(String req) {
 
         String[] lineArr = req.split(" ");
