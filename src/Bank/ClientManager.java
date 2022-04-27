@@ -20,50 +20,18 @@ public class ClientManager implements Runnable{
     @Override
     public void run() {
 
-        String SQL = "";
+        String clientQuery = "";
 
         try {
-            SQL = dataFromClient.readUTF();
+            clientQuery = dataFromClient.readUTF();
         } catch (Exception e) {}
-        bankManager.printRequest(SQL);
+        bankManager.printRequest(clientQuery);
         try {
             System.out.println("close client socket.");
             socket.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-
-        /*
-        InputStream inputStream;
-        BufferedReader bufferedReader = null;
-        DataOutputStream dataOutputStream = null;
-
-        try {
-            inputStream = socket.getInputStream();
-            bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-            dataOutputStream = new DataOutputStream(socket.getOutputStream());
-            System.out.println("Client connected");
-        } catch(Exception e) {
-            e.printStackTrace();
-        }
-        String line;
-        while (true) {
-            try {
-                line = bufferedReader.readLine();
-                System.out.println(line + "111");
-
-            } catch (Exception e) {
-                //e.printStackTrace();
-            }
-
-        }
-
-         */
-
-
-
-
 
     }
 

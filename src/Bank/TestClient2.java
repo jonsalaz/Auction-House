@@ -5,6 +5,10 @@ import java.net.Socket;
 
 public class TestClient2 {
     public static void main(String[] args) {
+
+        String clientType = "auction";
+        String clientId = "auction1";
+        String clientRequest;
         Socket socket;
 
         {
@@ -13,7 +17,11 @@ public class TestClient2 {
                 try {
                     socket = new Socket("127.0.0.1", 1234);
                     DataOutputStream out = new DataOutputStream(socket.getOutputStream());
-                    out.writeUTF("Client 2 request #" + i++ + " | ");
+                    /** Message to bank server:
+                     * Formatted as "clientType clientId clientRequest"
+                     * where client request can be "createAccount, blockFunds, transferFunds, ... etc "*/
+                    clientRequest = "request#" + i++;
+                    out.writeUTF(clientType + " " + clientId + " " + clientRequest);
                     Thread.sleep(2000);
 
                 } catch (Exception e) {
