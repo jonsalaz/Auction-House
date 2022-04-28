@@ -11,8 +11,10 @@ public class AuctionHouseApplication {
             server = new ServerSocket(1013);
             while (true) {
                 System.out.println("Waiting for a connection");
-                Socket socket = server.accept();
+                Socket client = server.accept();
                 System.out.println("Client accepted!");
+                Thread thread = new Thread(new ClientManager(client));
+                thread.start();
             }
         } catch (IOException e) {
             e.printStackTrace();
