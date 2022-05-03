@@ -7,10 +7,11 @@ import java.net.Socket;
 public class AuctionHouseApplication {
     public static void main(String[] args) {
         int port = -1;
+        Socket bank = null;
 
         // Register with the bank and request a port.
         try {
-            Socket bank = new Socket("127.0.0.1", 1234);
+            bank = new Socket("127.0.0.1", 1234);
             port = BankRegistration(bank);
         } catch (Exception e) {
             System.out.println("Bank does not exist.");
@@ -24,7 +25,7 @@ public class AuctionHouseApplication {
                 System.out.println("Waiting for a connection");
                 Socket client = server.accept();
                 System.out.println("Client accepted!");
-                Thread thread = new Thread(new ClientManager(client));
+                Thread thread = new Thread(new ClientManager(client, bank));
                 thread.start();
             }
         } catch (IOException e) {

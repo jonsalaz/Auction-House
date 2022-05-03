@@ -5,14 +5,15 @@ import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.net.Socket;
-import java.nio.Buffer;
 import java.util.Locale;
 
 public class ClientManager implements Runnable {
     Socket client;
+    Socket bank;
 
-    public ClientManager(Socket client) {
+    public ClientManager(Socket client, Socket bank) {
         this.client = client;
+        this.bank = bank;
     }
 
     @Override
@@ -20,14 +21,42 @@ public class ClientManager implements Runnable {
         //TODO client login and request information.
         try {
             DataInputStream in = new DataInputStream(new BufferedInputStream(client.getInputStream()));
-            DataOutputStream out = new DataOutputStream(new BufferedOutputStream(client.getOutputStream()));
             String request = "";
             while(!request.toLowerCase(Locale.ROOT).equals("quit")) {
                     request = in.readUTF();
-                    System.out.println("The following request has been made: " + request);
+                    String[] details = request.split(" ");
+                    request = details[0];
+                    switch(request) {
+                        //Request for listed items.
+                        case("items"):
+                            provideListings();
+                            break;
+                        //Request to place bid.
+                        case("bid"):
+                            //TODO Bidding logic.
+                            break;
+                        //Request to disconnect from auction house.
+                        case("quit"):
+                            break;
+                        default:
+                            System.out.println("Invalid Request");
+                            break;
+                    }
             }
 
             client.close();
         } catch (Exception e) {}
+    }
+
+    private void provideListings() {
+        try {
+            BufferedOutputStream out = new BufferedOutputStream(client.getOutputStream());
+            while (true) {
+                //TODO Write a line to output for each item currently listed.
+                // Item House ID, Item ID, description, minimum bid, current bid
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
