@@ -37,16 +37,20 @@ public class AuctionHouseApplication {
         DataOutputStream out;
         DataInputStream in;
         try {
+            // Request registration with the bank.
             out = new DataOutputStream(bank.getOutputStream());
             out.writeUTF("Register AuctionHouse");
+
+            // Receive Port from Bank
             in = new DataInputStream(bank.getInputStream());
-            while(port == -1) {
-                port = in.readInt();
-            }
+            port = in.readInt();
+
+            // Close streams once port is received.
+            in.close();
+            out.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         return port;
     }
 }
