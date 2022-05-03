@@ -1,14 +1,25 @@
 package AuctionHouse;
 
-import java.io.IOException;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 
 public class AuctionHouseApplication {
     public static void main(String[] args) {
-        ServerSocket server = null;
+        int port = -1;
+
+        // Register with the bank and request a port.
         try {
-            server = new ServerSocket(1013);
+            Socket bank = new Socket("127.0.0.1", 1234);
+            port = BankRegistration(bank);
+        } catch (Exception e) {
+            System.out.println("Bank does not exist.");
+            System.exit(1);
+        }
+
+        ServerSocket server;
+        try {
+            server = new ServerSocket(port);
             while (true) {
                 System.out.println("Waiting for a connection");
                 Socket client = server.accept();
@@ -19,5 +30,23 @@ public class AuctionHouseApplication {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private static int BankRegistration(Socket bank) {
+        int port = -1;
+        DataOutputStream out;
+        DataInputStream in;
+        try {
+            out = new DataOutputStream(bank.getOutputStream());
+            out.writeUTF("Register AuctionHouse");
+            in = new DataInputStream(bank.getInputStream());
+            while(port == -1) {
+                port = in.readInt();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return port;
     }
 }
