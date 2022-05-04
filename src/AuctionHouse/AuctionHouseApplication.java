@@ -40,12 +40,11 @@ public class AuctionHouseApplication {
         int port = -1;
         DataOutputStream out;
         DataInputStream in;
+        Scanner scanner = new Scanner(System.in);
 
         while(true) {
             System.out.println("Please Input Desired Port Number");
-            Scanner scanner = new Scanner(System.in);
             port = scanner.nextInt();
-            scanner.close();
 
             try {
                 // Request registration with the bank.
