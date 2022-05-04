@@ -3,18 +3,18 @@ package AuctionHouse;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Scanner;
 
 public class AuctionHouseApplication {
     public static void main(String[] args) {
-        // TODO temp init port for testing
-        int port = 1423;
         Socket bank = null;
+        int port = -1;
 
         // Register with the bank and request a port.
         try {
             bank = new Socket("127.0.0.1", 1234);
             /** port = BankRegistration(bank); */
-            BankRegistration(bank, port);
+            port = BankRegistration(bank);
         } catch (Exception e) {
             System.out.println("Bank does not exist.");
             System.exit(1);
@@ -35,27 +35,34 @@ public class AuctionHouseApplication {
         }
     }
 
-    private static int BankRegistration(Socket bank, int port) {
-        // int port = 1352;
+    private static int BankRegistration(Socket bank) {
+        int port = -1;
         DataOutputStream out;
         DataInputStream in;
-        try {
-            // Request registration with the bank.
-            out = new DataOutputStream(bank.getOutputStream());
-            // TODO may want to send whole AH serverSocket to bank and parse port in bank for id? idk
-            /** Action ClientType ClientId */
-            out.writeUTF("Register AuctionHouse " + port);
 
-            // Receive Port from Bank
-            /** in = new DataInputStream(bank.getInputStream());
-            port = in.readInt();*/
+        while(true) {
+            System.out.println("Please Input Desired Port Number");
+            Scanner scanner = new Scanner(System.in);
+            port = scanner.nextInt();
+            scanner.close();
 
-            // Close streams once port is received.
-            /** in.close(); */
-            out.close();
-        } catch (Exception e) {
-            e.printStackTrace();
+            try {
+                // Request registration with the bank.
+                out = new DataOutputStream(bank.getOutputStream());
+                in = new DataInputStream(bank.getInputStream());
+                // TODO may want to send whole AH serverSocket to bank and parse port in bank for id? idk
+                /** Action ClientType ClientId */
+                out.writeUTF("Register AuctionHouse " + port);
+
+                // Check if Bank Approves this port number.
+                if(in.readUTF().equals("approved")) {
+                    // Close connection once registration is complete.
+                    out.close();
+                    return port;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
-        return port;
     }
 }
