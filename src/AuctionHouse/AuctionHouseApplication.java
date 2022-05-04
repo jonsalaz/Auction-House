@@ -32,6 +32,7 @@ public class AuctionHouseApplication {
             }
         } catch (IOException e) {
             e.printStackTrace();
+            System.exit(1);
         }
     }
 
@@ -63,6 +64,7 @@ public class AuctionHouseApplication {
                 }
             } catch (Exception e) {
                 e.printStackTrace();
+                System.exit(1);
             }
         }
     }
