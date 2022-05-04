@@ -20,9 +20,10 @@ public class BankApplication {
                 while (true) {
 
                     ServerSocket serverSocket = new ServerSocket(1234);
-                    System.out.println("Server waiting for connection");
+                    System.out.println("\nServer waiting for connection");
                     Socket clientSocket = serverSocket.accept();
-                    ClientManager clientManager = new ClientManager(clientSocket, bankManager);
+                    System.out.println("ACCEPTED CLIENT\n");
+                    BankClientManager clientManager = new BankClientManager(clientSocket, bankManager);
                     clientManager.run();
 
                     serverSocket.close();
@@ -34,6 +35,4 @@ public class BankApplication {
 
     }
 
-
-    Socket socket = null;
 }

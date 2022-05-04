@@ -42,6 +42,8 @@ public class AuctionHouseApplication {
         try {
             // Request registration with the bank.
             out = new DataOutputStream(bank.getOutputStream());
+            // TODO may want to send whole AH serverSocket to bank and parse port in bank for id? idk
+            /** Action ClientType ClientId */
             out.writeUTF("Register AuctionHouse " + port);
 
             // Receive Port from Bank
