@@ -20,6 +20,8 @@ public class AuctionHouseApplication {
             System.exit(1);
         }
 
+        //TODO Create Central Auction Manager that maintains all current auctions and bid requests.
+
         ServerSocket server;
         try {
             server = new ServerSocket(port);
