@@ -56,9 +56,6 @@ public class AuctionHouseApplication {
 
                 // Check if Bank Approves this port number.
                 if(in.readUTF().equals("approved")) {
-                    // Close Data Streams once registration is complete.
-                    out.close();
-                    in.close();
                     return port;
                 }
             } catch (Exception e) {
