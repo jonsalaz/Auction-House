@@ -6,13 +6,15 @@ import java.net.Socket;
 
 public class AuctionHouseApplication {
     public static void main(String[] args) {
-        int port = -1;
+        // TODO temp init port for testing
+        int port = 1423;
         Socket bank = null;
 
         // Register with the bank and request a port.
         try {
             bank = new Socket("127.0.0.1", 1234);
-            port = BankRegistration(bank);
+            /** port = BankRegistration(bank); */
+            BankRegistration(bank, port);
         } catch (Exception e) {
             System.out.println("Bank does not exist.");
             System.exit(1);
@@ -25,7 +27,7 @@ public class AuctionHouseApplication {
                 System.out.println("Waiting for a connection");
                 Socket client = server.accept();
                 System.out.println("Client accepted!");
-                Thread thread = new Thread(new ClientManager(client, bank));
+                Thread thread = new Thread(new AHClientManager(client, bank));
                 thread.start();
             }
         } catch (IOException e) {
@@ -33,21 +35,21 @@ public class AuctionHouseApplication {
         }
     }
 
-    private static int BankRegistration(Socket bank) {
-        int port = -1;
+    private static int BankRegistration(Socket bank, int port) {
+        // int port = 1352;
         DataOutputStream out;
         DataInputStream in;
         try {
             // Request registration with the bank.
             out = new DataOutputStream(bank.getOutputStream());
-            out.writeUTF("Register AuctionHouse");
+            out.writeUTF("Register AuctionHouse " + port);
 
             // Receive Port from Bank
-            in = new DataInputStream(bank.getInputStream());
-            port = in.readInt();
+            /** in = new DataInputStream(bank.getInputStream());
+            port = in.readInt();*/
 
             // Close streams once port is received.
-            in.close();
+            /** in.close(); */
             out.close();
         } catch (Exception e) {
             e.printStackTrace();

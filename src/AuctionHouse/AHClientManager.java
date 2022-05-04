@@ -7,11 +7,11 @@ import java.io.DataOutputStream;
 import java.net.Socket;
 import java.util.Locale;
 
-public class ClientManager implements Runnable {
+public class AHClientManager implements Runnable {
     Socket client;
     Socket bank;
 
-    public ClientManager(Socket client, Socket bank) {
+    public AHClientManager(Socket client, Socket bank) {
         this.client = client;
         this.bank = bank;
     }
