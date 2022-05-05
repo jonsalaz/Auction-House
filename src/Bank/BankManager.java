@@ -46,12 +46,14 @@ public class BankManager {
 
     public void registerAccount(Socket clientSocket, String clientType, String clientId) throws IOException {
 
+        DataOutputStream outputStream = new DataOutputStream(clientSocket.getOutputStream());
 
         if (!accounts.containsKey(clientId)) {
             if (clientType.equals("AuctionHouse")) {
                 System.out.println("Registering AH");
                 accounts.put(clientId, 0.0);
                 auctionHousePorts.add(Integer.valueOf(clientId));
+                outputStream.writeUTF("Registration successful");
             }
             else {
                 // TODO agent account balanced should be specified on agent creation
@@ -61,16 +63,21 @@ public class BankManager {
 
                 if (auctionHousePorts.size() > 0) {
                     System.out.println("Sending AH address to client");
-                    DataOutputStream outputStream = new DataOutputStream(clientSocket.getOutputStream());
                     outputStream.writeUTF("Register AuctionHouse " + auctionHousePorts);
-                    outputStream.close();
                 }
 
             }
         }
 
+        // if account already exists w/ id
+        else {
+            if (clientType.equals("AuctionHouse")) {
+                outputStream.writeUTF("Invalid port");
+            }
+            else outputStream.writeUTF("Invalid username");
+        }
 
-
+        outputStream.close();
     }
 
     public void printRequest(String[] req) {

@@ -57,7 +57,8 @@ public class AuctionHouseApplication {
                 out.writeUTF("Register AuctionHouse " + port);
 
                 // Check if Bank Approves this port number.
-                if(in.readUTF().equals("approved")) {
+                if(in.readUTF().equals("Registration successful")) {
+                    System.out.println("Registration successful");
                     return port;
                 }
             } catch (Exception e) {
