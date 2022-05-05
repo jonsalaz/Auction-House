@@ -64,6 +64,7 @@ public class AuctionHouseApplication {
                 }
                 else {
                     System.out.print("Port already in use, ");
+                    bank = new Socket("127.0.0.1", 1234);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
