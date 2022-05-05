@@ -3,17 +3,17 @@ package AuctionHouse;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.net.Socket;
 import java.util.Locale;
 
 public class AHClientManager implements Runnable {
     Socket client;
     Socket bank;
-
-    public AHClientManager(Socket client, Socket bank) {
+    AHManager manager;
+    public AHClientManager(Socket client, Socket bank, AHManager manager) {
         this.client = client;
         this.bank = bank;
+        this.manager = manager;
     }
 
     @Override

@@ -21,6 +21,7 @@ public class AuctionHouseApplication {
         }
 
         //TODO Create Central Auction Manager that maintains all current auctions and bid requests.
+        AHManager manager = new AHManager();
 
         ServerSocket server;
         try {
@@ -29,7 +30,7 @@ public class AuctionHouseApplication {
                 System.out.println("Waiting for a connection");
                 Socket client = server.accept();
                 System.out.println("Client accepted!");
-                Thread thread = new Thread(new AHClientManager(client, bank));
+                Thread thread = new Thread(new AHClientManager(client, bank, manager));
                 thread.start();
             }
         } catch (IOException e) {
