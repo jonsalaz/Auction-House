@@ -19,7 +19,7 @@ public class BankClientManager implements Runnable{
             bankManager.handleClientRequest(socket);
 
             System.out.println("close client socket.");
-            socket.close();
+            //socket.close();
         } catch (Exception e) {}
 
     }

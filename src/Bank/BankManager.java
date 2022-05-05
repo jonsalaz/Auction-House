@@ -8,12 +8,39 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+/** Container class to hold transactions of bids while auction ongoing */
+class Transaction{
+    private String agentId;
+    private String auctionId;
+    private Long bidAmount;
+
+    public Transaction(String agentId, String auctionId, Long bidAmount) {
+        this.agentId = agentId;
+        this.auctionId = auctionId;
+        this.bidAmount = bidAmount;
+    }
+
+    public String getAgentId() {
+        return agentId;
+    }
+
+    public String getAuctionId() {
+        return auctionId;
+    }
+
+    public Long getBidAmount() {
+        return bidAmount;
+    }
+}
+
 public class BankManager {
 
     // testing
     private int totalRequestsMade = 0;
 
-    private HashMap<String, Double> accounts = new HashMap<>();
+    private HashMap<String, Long> accounts = new HashMap<>();
+    /** funds held until auction won, (K: item id, V: TransactionAccounts) */
+    private HashMap<String, Transaction> bidsInEscrow = new HashMap<>();
     private List<Integer> auctionHousePorts = new ArrayList<>();
 
     public BankManager() {
@@ -22,55 +49,113 @@ public class BankManager {
     public void handleClientRequest(Socket clientSocket) {
 
         try {
-
             DataInputStream inputStream = new DataInputStream(clientSocket.getInputStream());
             String[] clientQuery = inputStream.readUTF().split(" ");
-            //System.out.println(clientQuery[0] + " " + clientQuery[0].isEmpty());
 
             String clientInstruction = clientQuery[0];
-            String clientType = clientQuery[1];
-            System.out.println(clientType);
-            String clientId = clientQuery[2];
 
             if (clientInstruction.equals("Register")) {
-                registerAccount(clientSocket, clientType, clientId);
+                registerAccount(clientSocket, clientQuery);
+            }
+
+            if (clientInstruction.equals("Bid")) {
+                setAuctionBid(clientSocket, clientQuery);
+            }
+
+            if (clientInstruction.equals("Finalize")) {
+                finalizeAuction(clientSocket, clientQuery);
             }
 
             printRequest(clientQuery);
+            inputStream.close();
 
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
-    public void registerAccount(Socket clientSocket, String clientType, String clientId) throws IOException {
-
+    private void registerAccount(Socket clientSocket, String[] query) throws IOException {
+        DataOutputStream outputStream = new DataOutputStream(clientSocket.getOutputStream());
+        String clientType = query[1];
+        String clientId = query[2];
 
         if (!accounts.containsKey(clientId)) {
             if (clientType.equals("AuctionHouse")) {
                 System.out.println("Registering AH");
-                accounts.put(clientId, 0.0);
+                accounts.put(clientId, Long.valueOf(0));
                 auctionHousePorts.add(Integer.valueOf(clientId));
+                outputStream.writeUTF("Registration successful");
             }
             else {
                 // TODO agent account balanced should be specified on agent creation
-                accounts.put(clientId, 0.0);
+                accounts.put(clientId, Long.valueOf(0));
                 System.out.println("Registering Agent");
                 System.out.println(clientSocket.getLocalAddress() + " " + clientSocket.getLocalPort());
 
                 if (auctionHousePorts.size() > 0) {
                     System.out.println("Sending AH address to client");
-                    DataOutputStream outputStream = new DataOutputStream(clientSocket.getOutputStream());
                     outputStream.writeUTF("Register AuctionHouse " + auctionHousePorts);
-                    outputStream.close();
                 }
 
             }
         }
 
+        // if account already exists w/ id
+        else {
+            if (clientType.equals("AuctionHouse")) {
+                outputStream.writeUTF("Invalid port");
+            }
+            else outputStream.writeUTF("Invalid username");
+        }
 
+        outputStream.close();
+    }
 
+    /** Query format: Bid AgentId AuctionHouseId ItemId BidAmount */
+    private void setAuctionBid(Socket clientSocket, String[] query) throws IOException {
+        DataOutputStream outputStream = new DataOutputStream(clientSocket.getOutputStream());
+        String agentId = query[1];
+        String auctionId = query[2];
+        String itemId = query[3];
+        Long bidAmount = Long.valueOf(query[4]);
+
+        if (accounts.containsKey(agentId) && accounts.containsKey(auctionId)) {
+
+            /** if bid is more than agent has in account, reject */
+            if (bidAmount > accounts.get(agentId)) {
+                outputStream.writeUTF("Bid rejected");
+                outputStream.close();
+                return;
+            }
+
+            /** if previous bids exist on item, must free funds */
+            if (bidsInEscrow.containsKey(itemId)) {
+                freeFunds(itemId);
+            }
+
+            /** hold agent's funds & update agents account balance */
+            Transaction newBid = new Transaction(agentId, auctionId, bidAmount);
+            bidsInEscrow.put(itemId, newBid);
+
+            Long agentBalance = accounts.get(agentId);
+            agentBalance -= bidAmount;
+            accounts.put(agentId, agentBalance);
+        }
+
+        outputStream.close();
+    }
+
+    /** Query format: Finalize AgentId AuctionHouseId ItemId */
+    private void finalizeAuction(Socket clientSocket, String[] query) {
+
+    }
+
+    /** Helper function to release funds from prior bid when higher bid accepted */
+    private void freeFunds(String itemId) {
+        Transaction prevTransaction = bidsInEscrow.get(itemId);
+        Long updatedAgentBalance = accounts.get(prevTransaction.getAgentId());
+        updatedAgentBalance += accounts.get(prevTransaction.getBidAmount());
+        accounts.put(prevTransaction.getAgentId(), updatedAgentBalance);
     }
 
     public void printRequest(String[] req) {

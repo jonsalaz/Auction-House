@@ -53,13 +53,17 @@ public class AuctionHouseApplication {
                 // Request registration with the bank.
                 out = new DataOutputStream(bank.getOutputStream());
                 in = new DataInputStream(bank.getInputStream());
-                // TODO may want to send whole AH serverSocket to bank and parse port in bank for id? idk
+
                 /** Action ClientType ClientId */
                 out.writeUTF("Register AuctionHouse " + port);
 
                 // Check if Bank Approves this port number.
-                if(in.readUTF().equals("approved")) {
+                if(in.readUTF().equals("Registration successful")) {
+                    System.out.println("Registration successful");
                     return port;
+                }
+                else {
+                    System.out.print("Port already in use, ");
                 }
             } catch (Exception e) {
                 e.printStackTrace();
