@@ -23,27 +23,26 @@ public class AHClientManager implements Runnable {
             DataInputStream in = new DataInputStream(new BufferedInputStream(client.getInputStream()));
             String request = "";
             while(!request.toLowerCase(Locale.ROOT).equals("quit")) {
-                    request = in.readUTF();
-                    String[] details = request.split(" ");
-                    request = details[0];
-                    switch(request) {
-                        //Request for listed items.
-                        case("items"):
-                            provideListings();
-                            break;
-                        //Request to place bid.
-                        case("bid"):
-                            //TODO Bidding logic.
-                            break;
-                        //Request to disconnect from auction house.
-                        case("quit"):
-                            break;
-                        default:
-                            System.out.println("Invalid Request");
-                            break;
-                    }
+                request = in.readUTF();
+                String[] details = request.split(" ");
+                request = details[0];
+                switch(request) {
+                    //Request for listed items.
+                    case("items"):
+                        provideListings();
+                        break;
+                    //Request to place bid.
+                    case("bid"):
+                        //TODO Bidding logic.
+                        break;
+                    //Request to disconnect from auction house.
+                    case("quit"):
+                        break;
+                    default:
+                        System.out.println("Invalid Request");
+                        break;
+                }
             }
-
             client.close();
         } catch (Exception e) {}
     }
