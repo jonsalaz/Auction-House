@@ -35,9 +35,6 @@ class Transaction{
 
 public class BankManager {
 
-    // testing
-    private int totalRequestsMade = 0;
-
     private HashMap<String, Long> accounts = new HashMap<>();
     /** funds held until auction won, (K: item id, V: TransactionAccounts) */
     private HashMap<String, Transaction> bidsInEscrow = new HashMap<>();
@@ -86,15 +83,18 @@ public class BankManager {
                 auctionHousePorts.add(Integer.valueOf(clientId));
                 outputStream.writeUTF("Registration successful");
             }
-            else {
-                // TODO agent account balanced should be specified on agent creation
-                accounts.put(clientId, Long.valueOf(0));
+            else if (clientType.equals("Agent")) {
+                Long initBalance= Long.valueOf(query[3]);
+                accounts.put(clientId, initBalance);
                 System.out.println("Registering Agent");
                 System.out.println(clientSocket.getLocalAddress() + " " + clientSocket.getLocalPort());
 
                 if (auctionHousePorts.size() > 0) {
                     System.out.println("Sending AH address to client");
-                    outputStream.writeUTF("Register AuctionHouse " + auctionHousePorts);
+                    outputStream.writeUTF("Register AuctionHouse " + getFormattedPorts());
+                }
+                else {
+                    outputStream.writeUTF("No auction houses found");
                 }
 
             }
@@ -165,7 +165,6 @@ public class BankManager {
         outputStream.writeUTF("Auction House balance updated: $" + auctionHouseBalance
                 + " -> $" + updatedBalance);
 
-
         outputStream.close();
     }
 
@@ -177,8 +176,18 @@ public class BankManager {
         accounts.put(prevTransaction.getAgentId(), updatedAgentBalance);
     }
 
+    /** Utility function to return list of ports as dash seperated string */
+    private String getFormattedPorts() {
+        String portString = "";
+        for (Integer i : auctionHousePorts) {
+            portString += i + "-";
+
+        }
+        return portString;
+    }
+
     public void printRequest(String[] req) {
-        for (String s : req) System.out.print(s + " ");
-        System.out.println(" | total reqs by clients: " + totalRequestsMade++);
+        for (String s : req) System.out.print(s+ " ");
+        System.out.println();
     }
 }
