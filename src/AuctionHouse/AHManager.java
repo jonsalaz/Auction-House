@@ -16,6 +16,17 @@ public class AHManager {
         initializeAuctions();
         this.auctionTimer = Executors.newSingleThreadScheduledExecutor();
         try {
+            // this::finalizeAuctions is equivalent to
+            // new Runnable {
+            //      @Override
+            //      public void run() {
+            //          finalizeAuctions();
+            //      }
+            // }
+            // OR
+            // () -> finalizeAuctions()
+            // This is easier and more readable than creating a new runnable object that only contains the logic for
+            // closing an auction.
             auctionTimer.scheduleAtFixedRate(this::finalizeAuctions, 1, 1, TimeUnit.SECONDS);
         } catch (Exception e) {
             e.printStackTrace();
