@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Random;
 
 public class AHManager {
     ArrayList<Auction> auctions;
@@ -18,20 +19,24 @@ public class AHManager {
         InputStream in = getClass().getResourceAsStream("/items");
         BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 
-        int itemCount = 0;
         String[] splitLine = null;
         String line = null;
+        ArrayList<Auction> options = new ArrayList<>();
         try {
             line = reader.readLine();
-            while(line != null && itemCount < 3) {
+            while(line != null) {
                 splitLine = line.split(" ");
                 Auction auction = new Auction(Integer.parseInt(splitLine[0]),
                                                 splitLine[1],
                                                 Integer.parseInt(splitLine[2]));
-                auctions.add(auction);
-                itemCount++;
+                options.add(auction);
             }
         } catch (IOException e) {}
+        Random random = new Random();
+        for(int i = 0; i < 3; i++) {
+            auctions.add(options.get(random.nextInt(options.size())));
+        }
+
         return initialAuctions;
     }
 }
