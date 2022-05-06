@@ -30,8 +30,9 @@ public class AHManager {
                                                 splitLine[1],
                                                 Integer.parseInt(splitLine[2]));
                 options.add(auction);
+                line = reader.readLine();
             }
-        } catch (IOException e) {}
+        } catch (IOException ignored) {}
         Random random = new Random();
         for(int i = 0; i < 3; i++) {
             auctions.add(options.get(random.nextInt(options.size())));
