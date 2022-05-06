@@ -9,4 +9,16 @@ public class Auction {
         this.name = name;
         this.value = value;
     }
+
+    public int getId() {
+        return id;
+    }
+
+    public int getCurrentBid() {
+        return value;
+    }
+
+    public String getName() {
+        return name;
+    }
 }

@@ -3,6 +3,7 @@ package AuctionHouse;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.net.Socket;
 import java.util.Locale;
 
@@ -28,7 +29,8 @@ public class AHClientManager implements Runnable {
                 switch(request) {
                     //Request for listed items.
                     case("items"):
-                        BufferedOutputStream out = new BufferedOutputStream(client.getOutputStream());
+                        DataOutputStream out =
+                                new DataOutputStream(new BufferedOutputStream(client.getOutputStream()));
                         manager.provideListings(out);
                         break;
                     //Request to place bid.

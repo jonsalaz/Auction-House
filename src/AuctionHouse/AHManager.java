@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class AHManager {
-    ArrayList<Auction> auctions;
+    private ArrayList<Auction> auctions;
 
     public AHManager() {
         this.auctions = initializeAuctions();
@@ -38,12 +38,10 @@ public class AHManager {
         return initialAuctions;
     }
 
-    public void provideListings(BufferedOutputStream out) {
+    public void provideListings(DataOutputStream out) {
         try {
-
-            while (true) {
-                //TODO Write a line to output for each item currently listed.
-                // Item House ID, Item ID, description, minimum bid, current bid
+            for (Auction auction: auctions) {
+                out.writeUTF(auction.getId() + " " + auction.getName() + " " + auction.getCurrentBid());
             }
         } catch (Exception e) {
             e.printStackTrace();
