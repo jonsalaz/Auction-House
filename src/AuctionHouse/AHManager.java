@@ -1,9 +1,6 @@
 package AuctionHouse;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -39,5 +36,17 @@ public class AHManager {
         }
 
         return initialAuctions;
+    }
+
+    public void provideListings(BufferedOutputStream out) {
+        try {
+
+            while (true) {
+                //TODO Write a line to output for each item currently listed.
+                // Item House ID, Item ID, description, minimum bid, current bid
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
