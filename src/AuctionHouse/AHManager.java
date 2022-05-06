@@ -3,12 +3,26 @@ package AuctionHouse;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class AHManager {
     private ArrayList<Auction> auctions;
+    private ScheduledExecutorService auctionTimer;
 
     public AHManager() {
         this.auctions = initializeAuctions();
+        this.auctionTimer = Executors.newSingleThreadScheduledExecutor();
+        auctionTimer.scheduleAtFixedRate(this::finalizeAuctions, 0,1, TimeUnit.SECONDS);
+    }
+
+    private void finalizeAuctions() {
+        System.out.println("Running");
+        for (Auction auction: auctions) {
+            //After a 30 second delay, the auctions are checked for finalization.
+            //TODO Check for auctions that need to be finalized.
+        }
     }
 
     private ArrayList<Auction> initializeAuctions() {
