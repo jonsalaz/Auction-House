@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 public class AHManager {
     private ArrayList<Auction> auctions;
     private ScheduledExecutorService auctionTimer;
+    private ArrayList<Auction> options;
 
     public AHManager() {
         initializeAuctions();
@@ -29,29 +30,31 @@ public class AHManager {
             //After a 30 second delay, the auctions are checked for finalization.
             if(System.currentTimeMillis() - auction.getStartTime() > 30*1000) {
                 closeAuction(auction);
-                auctions.remove(auction);
-                System.out.println("Removed the item :)");
+                replaceAuction();
                 finalizeAuctions();
                 return;
             }
         }
     }
 
+    private void replaceAuction() {
+        Random random = new Random();
+        this.auctions.add(options.get(random.nextInt(options.size())));
+    }
+
     private void closeAuction(Auction auction) {
-        //TODO Close the auction and remove auction from active auctions list.
-        System.out.println("Finalizing Auction");
-        System.out.println(auction.getId() + " " + auction.getName() + " " + auction.getCurrentBid());
+        auctions.remove(auction);
+        auction.finish();
     }
 
     private void initializeAuctions() {
         this.auctions = new ArrayList<>();
-        ArrayList<Auction> initialAuctions = new ArrayList<>();
+        this.options = new ArrayList<>();
         InputStream in = getClass().getResourceAsStream("items");
         BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 
         String[] splitLine = null;
         String line = null;
-        ArrayList<Auction> options = new ArrayList<>();
         try {
             line = reader.readLine();
             while(line != null) {
