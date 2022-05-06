@@ -31,6 +31,7 @@ public class AHManager {
                 closeAuction(auction);
                 auctions.remove(auction);
                 System.out.println("Removed the item :)");
+                finalizeAuctions();
                 return;
             }
         }
