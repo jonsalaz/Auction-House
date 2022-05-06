@@ -14,15 +14,24 @@ public class AHManager {
     public AHManager() {
         initializeAuctions();
         this.auctionTimer = Executors.newSingleThreadScheduledExecutor();
-        auctionTimer.scheduleAtFixedRate(this::finalizeAuctions, 0,1, TimeUnit.SECONDS);
+        try {
+            auctionTimer.scheduleAtFixedRate(this::finalizeAuctions, 1, 1, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void finalizeAuctions() {
         System.out.println("Checking for finished auctions.");
+        if(auctions.isEmpty()) return;
         for (Auction auction: auctions) {
+            System.out.println("Checking auction #: " + auction.getId());
             //After a 30 second delay, the auctions are checked for finalization.
             if(System.currentTimeMillis() - auction.getStartTime() > 30*1000) {
                 closeAuction(auction);
+                auctions.remove(auction);
+                System.out.println("Removed the item :)");
+                return;
             }
         }
     }
