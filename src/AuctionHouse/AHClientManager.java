@@ -18,7 +18,6 @@ public class AHClientManager implements Runnable {
 
     @Override
     public void run() {
-        //TODO client login and request information.
         try {
             DataInputStream in = new DataInputStream(new BufferedInputStream(client.getInputStream()));
             String request = "";
