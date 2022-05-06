@@ -1,19 +1,25 @@
 package AuctionHouse;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
 public class Auction {
     private int id;
     private String name;
     private int value;
     private float currentBid;
-    public Auction(int id, String name, int value) {
+    private long startTime;
+    public Auction(int id, String name, int value, long startTime) {
         this.id = id;
         this.name = name;
         this.value = value;
         this.currentBid = value;
+        this.startTime = startTime;
+    }
+
+    /**
+     * Getter function for start time.
+     * @return Auction start time.
+     */
+    public long getStartTime() {
+        return startTime;
     }
 
     /**

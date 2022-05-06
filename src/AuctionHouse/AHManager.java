@@ -12,22 +12,31 @@ public class AHManager {
     private ScheduledExecutorService auctionTimer;
 
     public AHManager() {
-        this.auctions = initializeAuctions();
+        initializeAuctions();
         this.auctionTimer = Executors.newSingleThreadScheduledExecutor();
         auctionTimer.scheduleAtFixedRate(this::finalizeAuctions, 0,1, TimeUnit.SECONDS);
     }
 
     private void finalizeAuctions() {
-        System.out.println("Running");
+        System.out.println("Checking for finished auctions.");
         for (Auction auction: auctions) {
             //After a 30 second delay, the auctions are checked for finalization.
-            //TODO Check for auctions that need to be finalized.
+            if(System.currentTimeMillis() - auction.getStartTime() > 5*1000) {
+                closeAuction(auction);
+            }
         }
     }
 
-    private ArrayList<Auction> initializeAuctions() {
+    private void closeAuction(Auction auction) {
+        //TODO Close the auction and remove auction from active auctions list.
+        System.out.println("Finalizing Auction");
+        System.out.println(auction.getId() + " " + auction.getName() + " " + auction.getCurrentBid());
+    }
+
+    private void initializeAuctions() {
+        this.auctions = new ArrayList<>();
         ArrayList<Auction> initialAuctions = new ArrayList<>();
-        InputStream in = getClass().getResourceAsStream("/items");
+        InputStream in = getClass().getResourceAsStream("items");
         BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 
         String[] splitLine = null;
@@ -39,7 +48,8 @@ public class AHManager {
                 splitLine = line.split(" ");
                 Auction auction = new Auction(Integer.parseInt(splitLine[0]),
                                                 splitLine[1],
-                                                Integer.parseInt(splitLine[2]));
+                                                Integer.parseInt(splitLine[2]),
+                                                System.currentTimeMillis());
                 options.add(auction);
                 line = reader.readLine();
             }
@@ -48,8 +58,6 @@ public class AHManager {
         for(int i = 0; i < 3; i++) {
             auctions.add(options.get(random.nextInt(options.size())));
         }
-
-        return initialAuctions;
     }
 
     public void provideListings(DataOutputStream out) {
