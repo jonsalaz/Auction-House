@@ -145,9 +145,28 @@ public class BankManager {
         outputStream.close();
     }
 
-    /** Query format: Finalize AgentId AuctionHouseId ItemId */
-    private void finalizeAuction(Socket clientSocket, String[] query) {
+    /** Query format: Finalize ItemId */
+    private void finalizeAuction(Socket clientSocket, String[] query) throws IOException {
+        DataOutputStream outputStream = new DataOutputStream(clientSocket.getOutputStream());
+        String itemId = query[1];
 
+        if (!bidsInEscrow.containsKey(itemId)) {
+            outputStream.writeUTF("Invalid auction item ID");
+            outputStream.close();
+            return;
+        }
+
+        /** Update auction house's account balance */
+        Transaction winningTransaction = bidsInEscrow.get(itemId);
+        String auctionHouseId = winningTransaction.getAuctionId();
+        Long auctionHouseBalance = accounts.get(auctionHouseId);
+        Long updatedBalance = auctionHouseBalance + winningTransaction.getBidAmount();
+        accounts.put(auctionHouseId, updatedBalance);
+        outputStream.writeUTF("Auction House balance updated: $" + auctionHouseBalance
+                + " -> $" + updatedBalance);
+
+
+        outputStream.close();
     }
 
     /** Helper function to release funds from prior bid when higher bid accepted */
