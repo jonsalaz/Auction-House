@@ -33,15 +33,11 @@ public class AHConnection implements Runnable {
 
             while (!queue.isEmpty()) {
                 String requesttoAH = queue.poll().toString();
-                System.out.println(requesttoAH + "<-----");
 
                 outToAH.writeUTF(requesttoAH);
                 //String responseFromAH = inFromAH.readUTF();
                 handleResponses(inFromAH);
             }
-
-
-
 
         } catch (Exception e){
             e.printStackTrace();
@@ -53,7 +49,6 @@ public class AHConnection implements Runnable {
     }
 
     private void handleResponses(DataInputStream inFromAH) throws IOException {
-
         String response = inFromAH.readUTF();
         System.out.println(response);
 
@@ -66,7 +61,9 @@ public class AHConnection implements Runnable {
             System.out.println(response);
             response = inFromAH.readUTF();
 
-            if (response.equals("winner")){}
+            if (response.contains("win")){
+                System.out.println("Auction for ");
+            }
 
         }
 

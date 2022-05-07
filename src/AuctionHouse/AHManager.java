@@ -101,6 +101,7 @@ public class AHManager {
             e.printStackTrace();
         }
     }
+
     // bid user itemID amount
     public void bidHandler(DataOutputStream out, String user, int id, long amount, int port) {
         //Search for auction with matching ID.
