@@ -27,7 +27,7 @@ public class AHClientManager implements Runnable {
             DataOutputStream out;
             String request = "";
             while(!request.toLowerCase(Locale.ROOT).equals("quit")) {
-                request = in.readUTF();
+                request = in.readUTF().toLowerCase();
                 String[] details = request.split(" ");
                 request = details[0];
                 switch(request) {
