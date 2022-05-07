@@ -116,7 +116,12 @@ public class AHManager {
                         // Bid request provided to bank.
                         outBank.writeUTF("Bid " + user + " " + port + " " + id + " " + amount);
                         //Bank response provided to user.
-                        out.writeUTF(inBank.readUTF());
+                        String status = inBank.readUTF();
+                        if(status.equalsIgnoreCase("Bid accepted")) {
+                            auction.setCurrentBid(amount);
+                            auction.setWinner(out);
+                        }
+                        out.writeUTF(status);
                     } catch (IOException e) {
                         System.out.println("Cannot connect to bank");
                         try {
