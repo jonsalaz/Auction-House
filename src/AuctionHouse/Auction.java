@@ -56,6 +56,7 @@ public class Auction {
      * Informs user of winning bid with format "win <id>" and finalizes the process.
      */
     public void finish() {
+        //TODO reset values.
         if(winner != null){
             try {
                 winner.writeUTF("win " + this.id);
@@ -69,5 +70,9 @@ public class Auction {
 
     public void setCurrentBid(float currentBid) {
         this.currentBid = currentBid;
+    }
+
+    public void setStartTime(long currentTimeMillis) {
+        this.startTime = currentTimeMillis;
     }
 }
