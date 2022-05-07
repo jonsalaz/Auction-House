@@ -29,7 +29,7 @@ public class AuctionHouseApplication {
                 System.out.println("Waiting for a connection");
                 Socket client = server.accept();
                 System.out.println("Client accepted!");
-                Thread thread = new Thread(new AHClientManager(client, bank, manager));
+                Thread thread = new Thread(new AHClientManager(client, bank, manager, port));
                 thread.start();
             }
         } catch (IOException e) {
