@@ -51,28 +51,25 @@ public class AHConnection implements Runnable {
     private void handleResponses(DataInputStream inFromAH, String request) throws IOException {
         String[] query = request.split(" ");
         String instruction = query[0];
-
         String response = inFromAH.readUTF();
-        System.out.println(response);
 
         switch (instruction) {
             case("items"): {
                 itemsResponse(response);
+                break;
             }
             case("bid"): {
                 bidResponse(response, inFromAH);
+                break;
             }
-
-
         }
-
     }
 
     private void bidResponse(String response, DataInputStream inFromAH) throws IOException {
-        if (response.equals("Bid rejected")) {
+        if (response.equalsIgnoreCase("Bid rejected")) {
             System.out.println("Insufficient balance in account to place bid.");
         }
-        else if (response.equals("Bid accepted")) {
+        else if (response.equalsIgnoreCase("Bid accepted")) {
             System.out.println(response);
             response = inFromAH.readUTF();
             String[] splitResponse = response.split(" ");

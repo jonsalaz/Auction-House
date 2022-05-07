@@ -99,7 +99,7 @@ public class AHManager {
             for (Auction auction: auctions) {
                 stringBuilder.append(auction.getId()).append(" ")
                         .append(auction.getName()).append(" ").append(auction.getCurrentBid()).append(" ")
-                        .append((30*1000 - (System.currentTimeMillis() - auction.getStartTime()) ) / 1000).append("\n");
+                        .append((30*1000 - (System.currentTimeMillis() - auction.getStartTime()) ) / 1000);
             }
             out.writeUTF(stringBuilder.toString());
         } catch (Exception e) {

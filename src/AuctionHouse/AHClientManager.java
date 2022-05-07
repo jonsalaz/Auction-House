@@ -39,7 +39,7 @@ public class AHClientManager implements Runnable {
                     //Request to place bid.
                     case("bid"):
                         // bid user itemID amount
-                        out = new DataOutputStream(new BufferedOutputStream(client.getOutputStream()));
+                        out = new DataOutputStream(client.getOutputStream());
                         manager.bidHandler(out, details[1], Integer.parseInt(details[2]), Long.parseLong(details[3]), port);
                         break;
                     //Request to disconnect from auction house.
