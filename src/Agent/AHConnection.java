@@ -73,12 +73,16 @@ public class AHConnection implements Runnable {
             System.out.println("Insufficient balance in account to place bid.");
         }
         else if (response.equals("Bid accepted")) {
-
             System.out.println(response);
             response = inFromAH.readUTF();
+            String[] splitResponse = response.split(" ");
 
-            if (response.contains("win")){
-                System.out.println("Auction for ");
+            if(response.equalsIgnoreCase("outbid")) {
+                System.out.println("You were outbid on item #" + splitResponse[1]);
+            }
+            else if (response.contains("win")){
+                finalizeAuction(splitResponse[1]);
+                System.out.println("Auction for item #" + splitResponse[1] + " won.");
             }
 
         }
@@ -89,7 +93,7 @@ public class AHConnection implements Runnable {
         System.out.println("----------------------");
         System.out.println("Auctions for AH#" + port);
         System.out.println(response);
-        System.out.println("----------------------");
+        System.out.println("----------------------\n");
     }
 
     private void finalizeAuction(String itemId) {
