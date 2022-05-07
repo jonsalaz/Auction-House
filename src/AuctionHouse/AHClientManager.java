@@ -23,7 +23,7 @@ public class AHClientManager implements Runnable {
     @Override
     public void run() {
         try {
-            DataInputStream in = new DataInputStream(new BufferedInputStream(client.getInputStream()));
+            DataInputStream in = new DataInputStream(client.getInputStream());
             DataOutputStream out;
             String request = "";
             while(!request.toLowerCase(Locale.ROOT).equals("quit")) {
@@ -33,7 +33,7 @@ public class AHClientManager implements Runnable {
                 switch(request) {
                     //Request for listed items.
                     case("items"):
-                        out = new DataOutputStream(new BufferedOutputStream(client.getOutputStream()));
+                        out = new DataOutputStream(client.getOutputStream());
                         manager.provideListings(out);
                         break;
                     //Request to place bid.
