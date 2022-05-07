@@ -43,24 +43,34 @@ public class BankManager {
     public BankManager() {
     }
     
-    public void handleClientRequest(Socket clientSocket) {
+    public void handleClientRequest(Socket clientSock) {
 
         try {
-            DataInputStream inputStream = new DataInputStream(clientSocket.getInputStream());
+            DataInputStream inputStream = new DataInputStream(clientSock.getInputStream());
             String[] clientQuery = inputStream.readUTF().split(" ");
 
             String clientInstruction = clientQuery[0];
 
-            if (clientInstruction.equals("Register")) {
-                registerAccount(clientSocket, clientQuery);
-            }
+            switch (clientInstruction) {
+                case("Register"): {
+                    registerAccount(clientSock, clientQuery);
+                    break;
+                }
+                case("Bid"): {
+                    setAuctionBid(clientSock, clientQuery);
+                    break;
+                }
+                case("Finalize"): {
+                    finalizeAuction(clientSock, clientQuery);
+                    break;
+                }
+                default: {
+                    DataOutputStream out =
+                            new DataOutputStream(clientSock.getOutputStream());
 
-            if (clientInstruction.equals("Bid")) {
-                setAuctionBid(clientSocket, clientQuery);
-            }
-
-            if (clientInstruction.equals("Finalize")) {
-                finalizeAuction(clientSocket, clientQuery);
+                    out.writeUTF("Invalid instruction received");
+                    out.close();
+                }
             }
 
             printRequest(clientQuery);
@@ -71,8 +81,8 @@ public class BankManager {
         }
     }
 
-    private void registerAccount(Socket clientSocket, String[] query) throws IOException {
-        DataOutputStream outputStream = new DataOutputStream(clientSocket.getOutputStream());
+    private void registerAccount(Socket clientSock, String[] query) throws IOException {
+        DataOutputStream outputStream = new DataOutputStream(clientSock.getOutputStream());
         String clientType = query[1];
         String clientId = query[2];
 
@@ -87,11 +97,11 @@ public class BankManager {
                 Long initBalance= Long.valueOf(query[3]);
                 accounts.put(clientId, initBalance);
                 System.out.println("Registering Agent");
-                System.out.println(clientSocket.getLocalAddress() + " " + clientSocket.getLocalPort());
+                System.out.println(clientSock.getLocalAddress() + " " + clientSock.getLocalPort());
 
                 if (auctionHousePorts.size() > 0) {
                     System.out.println("Sending AH address to client");
-                    outputStream.writeUTF("Add AuctionHouse "+ getFormattedPorts());
+                    outputStream.writeUTF("AddAH "+ getFormattedPorts());
                 }
                 else {
                     outputStream.writeUTF("No auction houses found");
@@ -112,8 +122,8 @@ public class BankManager {
     }
 
     /** Query format: Bid AgentId AuctionHouseId ItemId BidAmount */
-    private void setAuctionBid(Socket clientSocket, String[] query) throws IOException {
-        DataOutputStream outputStream = new DataOutputStream(clientSocket.getOutputStream());
+    private void setAuctionBid(Socket clientSock, String[] query) throws IOException {
+        DataOutputStream outputStream = new DataOutputStream(clientSock.getOutputStream());
         String agentId = query[1];
         String auctionId = query[2];
         String itemId = query[3];
@@ -146,8 +156,8 @@ public class BankManager {
     }
 
     /** Query format: Finalize ItemId */
-    private void finalizeAuction(Socket clientSocket, String[] query) throws IOException {
-        DataOutputStream outputStream = new DataOutputStream(clientSocket.getOutputStream());
+    private void finalizeAuction(Socket clientSock, String[] query) throws IOException {
+        DataOutputStream outputStream = new DataOutputStream(clientSock.getOutputStream());
         String itemId = query[1];
 
         if (!bidsInEscrow.containsKey(itemId)) {
