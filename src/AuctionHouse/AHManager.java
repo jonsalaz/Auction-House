@@ -50,6 +50,7 @@ public class AHManager {
     private void replaceAuction() {
         Random random = new Random();
         Auction replacement = options.get(random.nextInt(options.size()));
+        replacement.setStartTime(System.currentTimeMillis());
         for(Auction auction: auctions) {
             if(auction.getId() == replacement.getId()) {
                 replaceAuction();
@@ -97,7 +98,8 @@ public class AHManager {
         try {
             for (Auction auction: auctions) {
                 stringBuilder.append(auction.getId()).append(" ")
-                        .append(auction.getName()).append(" ").append(auction.getCurrentBid()).append("\n");
+                        .append(auction.getName()).append(" ").append(auction.getCurrentBid()).append(" ")
+                        .append((30*1000 - (System.currentTimeMillis() - auction.getStartTime()) ) / 1000).append("\n");
             }
             out.writeUTF(stringBuilder.toString());
         } catch (Exception e) {
