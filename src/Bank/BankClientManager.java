@@ -17,8 +17,7 @@ public class BankClientManager implements Runnable{
         try {
 
             bankManager.handleClientRequest(socket);
-
-            System.out.println("close client socket.");
+            //System.out.println("close client socket.");
             //socket.close();
         } catch (Exception e) {}
 
