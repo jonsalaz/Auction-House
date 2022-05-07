@@ -4,6 +4,7 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Locale;
 
@@ -11,7 +12,9 @@ public class AHClientManager implements Runnable {
     private Socket client;
     private Socket bank;
     private AHManager manager;
-    public AHClientManager(Socket client, Socket bank, AHManager manager) {
+    private int port;
+    public AHClientManager(Socket client, Socket bank, AHManager manager, int port) {
+        this.port = port;
         this.client = client;
         this.bank = bank;
         this.manager = manager;
@@ -37,7 +40,7 @@ public class AHClientManager implements Runnable {
                     case("bid"):
                         // bid user itemID amount
                         out = new DataOutputStream(new BufferedOutputStream(client.getOutputStream()));
-                        manager.bidHandler(out, details[1], Integer.parseInt(details[2]), Long.parseLong(details[3]));
+                        manager.bidHandler(out, details[1], Integer.parseInt(details[2]), Long.parseLong(details[3]), port);
                         break;
                     //Request to disconnect from auction house.
                     case("quit"):
