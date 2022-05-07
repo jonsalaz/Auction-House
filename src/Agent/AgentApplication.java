@@ -19,20 +19,24 @@ public class AgentApplication {
         initBalance = args[1];
 
         registerWithBank();
-        System.out.println("An account with username " + clientUsername
-                + " has been registered with the bank!");
         printUserCommands();
 
         String userInput = "";
         while (!userInput.equals("quit")) {
+            System.out.print("User input: ");
             userInput = scanner.nextLine();
+            System.out.println();
 
-            switch (userInput) {
-                case("GetAHs"): {
+            String[] query = userInput.split(" ");
+            String instruction = query[0];
+
+            switch (instruction) {
+                case("getAHs"): {
                     getAuctionHousesFromBank();
                     break;
                 }
                 case("bid"): {
+                    submitBidToAH(query);
                     break;
                 }
                 default: break;
@@ -48,11 +52,18 @@ public class AgentApplication {
 
             outToServer.writeUTF("Register Agent " + clientUsername + " " + initBalance);
             String response = inFromServer.readUTF();
-            System.out.println(response);
 
             outToServer.close();
             inFromServer.close();
             sockToBank.close();
+
+            if (response.equals("Invalid username")) {
+                System.out.println(clientUsername + " is already registered with bank.");
+            }
+            else {
+                System.out.println("An account with username " + clientUsername
+                        + " has been registered with the bank!");
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -68,15 +79,7 @@ public class AgentApplication {
 
             outToServer.writeUTF("GetAHs");
             String response = inFromServer.readUTF();
-
-            /** If auction houses are found*/
-            if (response.contains("returnAH")) {
-                establishAHConnection(response);
-            }
-            /** No auction houses exist */
-            else {
-                System.out.println(response);
-            }
+            establishAHConnection(response);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -87,13 +90,19 @@ public class AgentApplication {
 
     /** Query format: Add AuctionHouse ####-####-.... where (#### is an AH port) */
     private static void establishAHConnection(String query) {
+
+        if (!query.contains("returnAH")) {
+            System.out.println("No auction houses registered with bank.");
+            return;
+        }
+
         String[] clientQuery = query.split(" ");
         String portString = clientQuery[1];
         String[] ahPorts;
 
         if (portString.contains("-"))  ahPorts = portString.split("-");
         else {
-            /** if only one port exists */
+            // if only one port exists
             ahPorts = new String[1];
             ahPorts[0] = portString;
         }
@@ -102,8 +111,9 @@ public class AgentApplication {
             Integer ahPort = Integer.valueOf(strPort);
             if (!connectedAHs.containsKey(ahPort)) {
                 try {
-                    connectedAHs.put(ahPort,
-                            new AHConnection(localHost, ahPort));
+                    AHConnection newConnection = new AHConnection(localHost, ahPort);
+                    connectedAHs.put(ahPort, newConnection);
+                    newConnection.run();
                     System.out.println("Established connection with Auction House #" + ahPort);
                 } catch(Exception e){
                     System.out.println("exception");
@@ -111,14 +121,23 @@ public class AgentApplication {
 
             }
         }
+    }
 
+    private static void submitBidToAH(String[] userQuery) {
+        String auctionHouseId = userQuery[1];
+        String itemId = userQuery[2];
+        String bidAmount = userQuery[3];
+
+        AHConnection ah = connectedAHs.get(auctionHouseId);
+        ah.sendMessage("bid " + clientUsername + " " + itemId + " " + bidAmount);
+        ah.run();
     }
 
     /** Utility function for providing user with list of CL commands */
     private static void printUserCommands() {
         System.out.println("\nUser commands:");
-        System.out.println("Return list of active auction houses: getAHs");
-        System.out.println("Bid on an item: bid auctionHouseId itemId bidAmount\n");
+        System.out.println("Return list of active auction houses - getAHs");
+        System.out.println("Bid on an item - bid auctionHouseId itemId bidAmount");
     }
 
     /*

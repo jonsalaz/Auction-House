@@ -8,20 +8,17 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class AHConnection implements Runnable {
+    private String localHost;
     private Integer port;
-    private String type;
-    private Socket socketToServer;
-    private DataInputStream inFromServer;
-    private DataOutputStream outToServer;
+    private Socket sockToAH;
     private Queue queue = new ConcurrentLinkedQueue<String>();
 
     public AHConnection(String localHost, Integer port) {
+        this.localHost = localHost;
         this.port = port;
-        this.type = type;
 
         try {
-            socketToServer = new Socket(localHost, port);
-            outToServer = new DataOutputStream(socketToServer.getOutputStream());
+            sockToAH = new Socket(localHost, port);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -30,6 +27,34 @@ public class AHConnection implements Runnable {
     @Override
     public void run() {
 
+        try {
+            //DataOutputStream outToAH = new DataOutputStream(sockToAH.getOutputStream());
+            //DataInputStream inFromAH = new DataInputStream(sockToAH.getInputStream());
+
+            while (!queue.isEmpty()) {
+                String requesttoAH = queue.poll().toString();
+                System.out.println(requesttoAH);
+
+                //outToAH.writeUTF(requesttoAH);
+
+                //String responseFromAH = inFromAH.readUTF();
+                //if (responseFromAH.equals())
+
+
+
+            }
+
+
+
+
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
+
+
+
+        /*
         try {
             inFromServer = new DataInputStream(socketToServer.getInputStream());
             String response = "";
@@ -40,15 +65,12 @@ public class AHConnection implements Runnable {
                     outToServer.writeUTF(request);
                     response = inFromServer.readUTF();
                 }
-
-                if (type.equals("Bank")) {
-                    queue.add("GetAHs");
-                }
-
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+         */
     }
 
     public void sendMessage(String message) {

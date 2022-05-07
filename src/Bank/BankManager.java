@@ -105,7 +105,7 @@ public class BankManager {
 
                 if (auctionHousePorts.size() > 0) {
                     System.out.println("Sending AH address to client");
-                    outputStream.writeUTF("AddAH "+ getFormattedPorts());
+                    outputStream.writeUTF("returnAH "+ getFormattedPorts());
                 }
                 else {
                     outputStream.writeUTF("No auction houses found");
@@ -198,7 +198,7 @@ public class BankManager {
         if (auctionHousePorts.size() == 0) {
             outputStream.writeUTF("No auction houses found.");
         }
-        else outputStream.writeUTF("returnAH" + getFormattedPorts());
+        else outputStream.writeUTF("returnAH " + getFormattedPorts());
 
         System.out.println("\nSending AH addresses to client\n");
         outputStream.close();
