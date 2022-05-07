@@ -1,6 +1,7 @@
 package AuctionHouse;
 
 import java.io.*;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.concurrent.Executors;
@@ -94,7 +95,27 @@ public class AHManager {
         }
     }
     // bid user itemID amount
-    public void bidHandler(DataOutputStream out, String user, int id, long amount) {
-        //TODO
+    public void bidHandler(DataOutputStream out, String user, int id, long amount, int port) {
+        //TODO Check current auction to see if amount is larger than the current bid.
+        for(Auction auction: auctions) {
+            if(auction.getId() == id) {
+                if(auction.getCurrentBid() < amount) {
+                    //TODO Request bank to see if bid is approved.
+                    try {
+                        Socket bank = new Socket("127.0.0.1", 1234);
+                        DataOutputStream outBank = new DataOutputStream(bank.getOutputStream());
+                        DataInputStream inBank = new DataInputStream(bank.getInputStream());
+                        outBank.writeUTF("Bid " + user + " " + port + " " + id + " " + amount);
+
+                        out.writeUTF(inBank.readUTF());
+
+                    } catch (IOException e) {
+                        System.out.println("Cannot connect to bank");
+                        // out.writeUTF("Bid rejected");
+                    }
+                }
+                break;
+            }
+        }
     }
 }
