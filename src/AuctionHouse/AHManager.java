@@ -102,16 +102,30 @@ public class AHManager {
                 if(auction.getCurrentBid() < amount) {
                     //TODO Request bank to see if bid is approved.
                     try {
+                        //Connect with bank to make a request.
                         Socket bank = new Socket("127.0.0.1", 1234);
                         DataOutputStream outBank = new DataOutputStream(bank.getOutputStream());
                         DataInputStream inBank = new DataInputStream(bank.getInputStream());
+                        // Bid request provided to bank.
                         outBank.writeUTF("Bid " + user + " " + port + " " + id + " " + amount);
-
+                        //Bank response provided to user.
                         out.writeUTF(inBank.readUTF());
 
                     } catch (IOException e) {
                         System.out.println("Cannot connect to bank");
-                        // out.writeUTF("Bid rejected");
+                        try {
+                            out.writeUTF("Bid rejected");
+                        } catch (Exception ignored) {
+                            System.out.println("Connection to user lost");
+                        }
+                    }
+                }
+                // If requested bid amount is lower than current bid amount, reject bid.
+                else {
+                    try {
+                        out.writeUTF("Bid rejected");
+                    } catch (Exception ignored) {
+                        System.out.println("Connection to user lost.");
                     }
                 }
                 break;
