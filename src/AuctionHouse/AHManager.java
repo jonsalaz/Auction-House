@@ -35,12 +35,12 @@ public class AHManager {
     }
 
     private void finalizeAuctions() {
-        System.out.println("Checking for finished auctions.");
+        //System.out.println("Checking for finished auctions.");
         if(auctions.isEmpty()) return;
         for (Auction auction: auctions) {
             //After a 30 second delay, the auctions are checked for finalization.
             if(System.currentTimeMillis() - auction.getStartTime() > 30*1000) {
-                System.out.println("Closing auction #: " + auction.getId());
+                //System.out.println("Closing auction #: " + auction.getId());
                 closeAuction(auction);
                 return;
             }
@@ -97,6 +97,9 @@ public class AHManager {
         StringBuilder stringBuilder = new StringBuilder();
         try {
             for (Auction auction: auctions) {
+                if(auction.getStartTime() <= 0) {
+                    continue;
+                }
                 stringBuilder.append(auction.getId()).append(" ")
                         .append(auction.getName()).append(" ").append(auction.getCurrentBid()).append(" ")
                         .append((30*1000 - (System.currentTimeMillis() - auction.getStartTime()) ) / 1000).append("\n");
@@ -122,12 +125,15 @@ public class AHManager {
                         // Bid request provided to bank.
                         outBank.writeUTF("Bid " + user + " " + port + " " + id + " " + amount);
                         //Bank response provided to user.
+                        System.out.println("GETTING BANK STATUS " + user);
                         String status = inBank.readUTF();
+                        System.out.println("PRINTING BANK STATUS:" + status);
+                        out.writeUTF(status);
                         if(status.equalsIgnoreCase("Bid accepted")) {
+                            System.out.println("SETTING BID INFO");
                             auction.setCurrentBid(amount);
                             auction.setWinner(out);
                         }
-                        out.writeUTF(status);
                     } catch (IOException e) {
                         System.out.println("Cannot connect to bank");
                         try {
@@ -146,8 +152,11 @@ public class AHManager {
                     }
                 }
                 //Once correct auction is found. Break.
-                break;
+                return;
             }
         }
+        try {
+            out.writeUTF("Bid rejected");
+        } catch (IOException ignored) {}
     }
 }

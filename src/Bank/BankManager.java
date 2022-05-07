@@ -133,19 +133,26 @@ public class BankManager {
         String itemId = query[3];
         Long bidAmount = Long.valueOf(query[4]);
 
+        System.out.println("print1");
+
         if (accounts.containsKey(agentId) && accounts.containsKey(auctionId)) {
+            System.out.println("print2");
 
             /** if bid is more than agent has in account, reject */
             if (bidAmount > accounts.get(agentId)) {
+                System.out.println("PRINT ERROR");
                 outputStream.writeUTF("Bid rejected");
                 outputStream.close();
                 return;
             }
 
+            System.out.println(bidsInEscrow.containsKey(itemId));
             /** if previous bids exist on item, must free funds */
             if (bidsInEscrow.containsKey(itemId)) {
+                System.out.println("FREEING FUNDS");
                 freeFunds(itemId);
             }
+            System.out.println("DONE FREEING FUNDS");
 
             /** hold agent's funds & update agents account balance */
             Transaction newBid = new Transaction(agentId, auctionId, bidAmount);
@@ -156,7 +163,7 @@ public class BankManager {
             accounts.put(agentId, agentBalance);
             outputStream.writeUTF("Bid accepted");
         }
-
+        System.out.println("print4");
         outputStream.close();
     }
 
@@ -177,6 +184,7 @@ public class BankManager {
         Long auctionHouseBalance = accounts.get(auctionHouseId);
         Long updatedBalance = auctionHouseBalance + winningTransaction.getBidAmount();
         accounts.put(auctionHouseId, updatedBalance);
+        bidsInEscrow.remove(itemId);
         outputStream.writeUTF("Auction House balance updated: $" + auctionHouseBalance
                 + " -> $" + updatedBalance);
 
@@ -187,7 +195,7 @@ public class BankManager {
     private void freeFunds(String itemId) {
         Transaction prevTransaction = bidsInEscrow.get(itemId);
         Long updatedAgentBalance = accounts.get(prevTransaction.getAgentId());
-        updatedAgentBalance += accounts.get(prevTransaction.getBidAmount());
+        updatedAgentBalance += accounts.get(prevTransaction.getAgentId());
         accounts.put(prevTransaction.getAgentId(), updatedAgentBalance);
     }
 

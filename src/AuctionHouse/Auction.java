@@ -62,14 +62,15 @@ public class Auction {
             } catch (Exception ignored) {}
         }
         this.currentBid = value;
-        this.startTime = System.currentTimeMillis();
+        this.startTime = -1;
         this.winner = null;
     }
 
     public void setWinner(DataOutputStream winner) {
         if(this.winner != null) {
+            System.out.println("THERE WAS AN OUTBID");
             try {
-                winner.writeUTF("Outbid " + this.id);
+                this.winner.writeUTF("Outbid " + this.id);
             } catch (IOException ignored) {}
         }
         this.winner = winner;

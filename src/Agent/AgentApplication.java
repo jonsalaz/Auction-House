@@ -32,18 +32,19 @@ public class AgentApplication {
             String instruction = query[0];
 
             switch (instruction) {
-                case("ah"): {
+                case ("ah"): {
                     getAuctionHousesFromBank();
                     break;
                 }
-                case("bid"): {
+                case ("bid"): {
                     submitBidToAH(query);
                     break;
                 }
-                case("items"): {
+                case ("items"): {
                     getItemsFromAHs();
                 }
-                default: break;
+                default:
+                    break;
             }
         }
     }

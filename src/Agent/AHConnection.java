@@ -12,6 +12,8 @@ public class AHConnection implements Runnable {
     private Integer port;
     private Socket sockToAH;
     private Queue queue = new ConcurrentLinkedQueue<String>();
+    private DataOutputStream outToAH;
+    private DataInputStream inFromAH;
 
     public AHConnection(String localHost, Integer port) {
         this.localHost = localHost;
@@ -19,6 +21,8 @@ public class AHConnection implements Runnable {
 
         try {
             sockToAH = new Socket(localHost, port);
+            this.outToAH = new DataOutputStream(sockToAH.getOutputStream());
+            this.inFromAH = new DataInputStream(sockToAH.getInputStream());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -26,11 +30,7 @@ public class AHConnection implements Runnable {
 
     @Override
     public void run() {
-
         try {
-            DataOutputStream outToAH = new DataOutputStream(sockToAH.getOutputStream());
-            DataInputStream inFromAH = new DataInputStream(sockToAH.getInputStream());
-
             while (!queue.isEmpty()) {
                 String requesttoAH = queue.poll().toString();
 
@@ -51,7 +51,9 @@ public class AHConnection implements Runnable {
     private void handleResponses(DataInputStream inFromAH, String request) throws IOException {
         String[] query = request.split(" ");
         String instruction = query[0];
+        System.out.println("HANDLE RESPONSE NOW");
         String response = inFromAH.readUTF();
+        System.out.println("RETURNED: " + response);
 
         switch (instruction) {
             case("items"): {
@@ -71,10 +73,10 @@ public class AHConnection implements Runnable {
         }
         else if (response.equalsIgnoreCase("Bid accepted")) {
             System.out.println(response);
-            response = inFromAH.readUTF();
+            response = inFromAH.readUTF().toLowerCase();
             String[] splitResponse = response.split(" ");
 
-            if(response.equalsIgnoreCase("outbid")) {
+            if(response.contains("outbid")) {
                 System.out.println("You were outbid on item #" + splitResponse[1]);
             }
             else if (response.contains("win")){
