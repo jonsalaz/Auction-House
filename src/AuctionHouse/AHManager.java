@@ -93,10 +93,13 @@ public class AHManager {
     }
 
     public void provideListings(DataOutputStream out) {
+        StringBuilder stringBuilder = new StringBuilder();
         try {
             for (Auction auction: auctions) {
-                out.writeUTF(auction.getId() + " " + auction.getName() + " " + auction.getCurrentBid());
+                stringBuilder.append(auction.getId()).append(" ")
+                        .append(auction.getName()).append(" ").append(auction.getCurrentBid()).append("\n");
             }
+            out.writeUTF(stringBuilder.toString());
         } catch (Exception e) {
             e.printStackTrace();
         }
