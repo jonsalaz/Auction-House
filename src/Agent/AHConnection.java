@@ -7,17 +7,17 @@ import java.net.Socket;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class ServerConnection implements Runnable {
+public class AHConnection implements Runnable {
     private Integer port;
+    private String type;
     private Socket socketToServer;
     private DataInputStream inFromServer;
     private DataOutputStream outToServer;
-    private Agent agent;
     private Queue queue = new ConcurrentLinkedQueue<String>();
 
-    public ServerConnection(String localHost, Integer port, Agent agent) {
+    public AHConnection(String localHost, Integer port) {
         this.port = port;
-        this.agent = agent;
+        this.type = type;
 
         try {
             socketToServer = new Socket(localHost, port);
@@ -33,40 +33,22 @@ public class ServerConnection implements Runnable {
         try {
             inFromServer = new DataInputStream(socketToServer.getInputStream());
             String response = "";
-            while (!response.equalsIgnoreCase("quit")) {
+            while (true) {
                 while (!queue.isEmpty()) {
-                    outToServer.writeUTF(queue.poll().toString());
+                    String request = queue.poll().toString();
+                    System.out.println(request);
+                    outToServer.writeUTF(request);
                     response = inFromServer.readUTF();
-                    agent.handleServerResponse(response);
                 }
-                //request = inFromServer.readUTF();
-                //System.out.println(request);
+
+                if (type.equals("Bank")) {
+                    queue.add("GetAHs");
+                }
+
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-
-
-
-        /*
-
-        while (true) {
-            try {
-                while (!queue.isEmpty()) {
-                    String messageForServer = queue.poll().toString();
-                    System.out.println(messageForServer);
-                    out.writeUTF(messageForServer);
-                }
-                agent.receiveServerQuery(in.readUTF());
-            } catch (IOException e) {
-                live = false;
-                e.printStackTrace();
-            }
-        }
-
-         */
-
     }
 
     public void sendMessage(String message) {

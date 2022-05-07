@@ -56,6 +56,9 @@ public class BankManager {
                     registerAccount(clientSock, clientQuery);
                     break;
                 }
+                case("GetAHs"): {
+                    getAuctionHouses(clientSock);
+                }
                 case("Bid"): {
                     setAuctionBid(clientSock, clientQuery);
                     break;
@@ -81,6 +84,7 @@ public class BankManager {
         }
     }
 
+    /** Query format: Register ClientType ClientId (Optional: ClientInitBalance) */
     private void registerAccount(Socket clientSock, String[] query) throws IOException {
         DataOutputStream outputStream = new DataOutputStream(clientSock.getOutputStream());
         String clientType = query[1];
@@ -150,6 +154,7 @@ public class BankManager {
             Long agentBalance = accounts.get(agentId);
             agentBalance -= bidAmount;
             accounts.put(agentId, agentBalance);
+            outputStream.writeUTF("Bid accepted");
         }
 
         outputStream.close();
@@ -184,6 +189,19 @@ public class BankManager {
         Long updatedAgentBalance = accounts.get(prevTransaction.getAgentId());
         updatedAgentBalance += accounts.get(prevTransaction.getBidAmount());
         accounts.put(prevTransaction.getAgentId(), updatedAgentBalance);
+    }
+
+    private void getAuctionHouses(Socket clientSock) throws IOException {
+        DataOutputStream outputStream =
+                new DataOutputStream(clientSock.getOutputStream());
+
+        if (auctionHousePorts.size() == 0) {
+            outputStream.writeUTF("No auction houses found.");
+        }
+        else outputStream.writeUTF("returnAH" + getFormattedPorts());
+
+        System.out.println("\nSending AH addresses to client\n");
+        outputStream.close();
     }
 
     /** Utility function to return list of ports as dash seperated string */
