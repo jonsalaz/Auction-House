@@ -39,7 +39,7 @@ public class AHManager {
         if(auctions.isEmpty()) return;
         for (Auction auction: auctions) {
             //After a 30 second delay, the auctions are checked for finalization.
-            if(System.currentTimeMillis() - auction.getStartTime() > 5*1000) {
+            if(System.currentTimeMillis() - auction.getStartTime() > 30*1000) {
                 System.out.println("Closing auction #: " + auction.getId());
                 closeAuction(auction);
                 return;
