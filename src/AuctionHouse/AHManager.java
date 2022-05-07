@@ -38,12 +38,10 @@ public class AHManager {
         System.out.println("Checking for finished auctions.");
         if(auctions.isEmpty()) return;
         for (Auction auction: auctions) {
-            System.out.println("Checking auction #: " + auction.getId());
             //After a 30 second delay, the auctions are checked for finalization.
-            if(System.currentTimeMillis() - auction.getStartTime() > 30*1000) {
+            if(System.currentTimeMillis() - auction.getStartTime() > 5*1000) {
+                System.out.println("Closing auction #: " + auction.getId());
                 closeAuction(auction);
-                replaceAuction();
-                finalizeAuctions();
                 return;
             }
         }
@@ -51,12 +49,22 @@ public class AHManager {
 
     private void replaceAuction() {
         Random random = new Random();
-        this.auctions.add(options.get(random.nextInt(options.size())));
+        Auction replacement = options.get(random.nextInt(options.size()));
+        for(Auction auction: auctions) {
+            if(auction.getId() == replacement.getId()) {
+                replaceAuction();
+                return;
+            }
+        }
+//        System.out.println("Auction Replaced");
+        auctions.add(replacement);
     }
 
     private void closeAuction(Auction auction) {
         auctions.remove(auction);
         auction.finish();
+//        System.out.println("Replacing auction.");
+        replaceAuction();
     }
 
     private void initializeAuctions() {
@@ -79,9 +87,8 @@ public class AHManager {
                 line = reader.readLine();
             }
         } catch (IOException ignored) {}
-        Random random = new Random();
         for(int i = 0; i < 3; i++) {
-            auctions.add(options.get(random.nextInt(options.size())));
+            replaceAuction();
         }
     }
 
