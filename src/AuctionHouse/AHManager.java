@@ -96,11 +96,11 @@ public class AHManager {
     }
     // bid user itemID amount
     public void bidHandler(DataOutputStream out, String user, int id, long amount, int port) {
-        //TODO Check current auction to see if amount is larger than the current bid.
+        //Search for auction with matching ID.
         for(Auction auction: auctions) {
             if(auction.getId() == id) {
+                //Check if bid amount is higher than current auctions bid amount.
                 if(auction.getCurrentBid() < amount) {
-                    //TODO Request bank to see if bid is approved.
                     try {
                         //Connect with bank to make a request.
                         Socket bank = new Socket("127.0.0.1", 1234);
@@ -110,7 +110,6 @@ public class AHManager {
                         outBank.writeUTF("Bid " + user + " " + port + " " + id + " " + amount);
                         //Bank response provided to user.
                         out.writeUTF(inBank.readUTF());
-
                     } catch (IOException e) {
                         System.out.println("Cannot connect to bank");
                         try {
@@ -128,6 +127,7 @@ public class AHManager {
                         System.out.println("Connection to user lost.");
                     }
                 }
+                //Once correct auction is found. Break.
                 break;
             }
         }
