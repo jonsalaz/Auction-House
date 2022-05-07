@@ -28,20 +28,16 @@ public class AHConnection implements Runnable {
     public void run() {
 
         try {
-            //DataOutputStream outToAH = new DataOutputStream(sockToAH.getOutputStream());
-            //DataInputStream inFromAH = new DataInputStream(sockToAH.getInputStream());
+            DataOutputStream outToAH = new DataOutputStream(sockToAH.getOutputStream());
+            DataInputStream inFromAH = new DataInputStream(sockToAH.getInputStream());
 
             while (!queue.isEmpty()) {
                 String requesttoAH = queue.poll().toString();
-                System.out.println(requesttoAH);
+                System.out.println(requesttoAH + "<-----");
 
-                //outToAH.writeUTF(requesttoAH);
-
+                outToAH.writeUTF(requesttoAH);
                 //String responseFromAH = inFromAH.readUTF();
-                //if (responseFromAH.equals())
-
-
-
+                handleResponses(inFromAH);
             }
 
 
@@ -50,31 +46,46 @@ public class AHConnection implements Runnable {
         } catch (Exception e){
             e.printStackTrace();
         }
-
-
-
-
-        /*
-        try {
-            inFromServer = new DataInputStream(socketToServer.getInputStream());
-            String response = "";
-            while (true) {
-                while (!queue.isEmpty()) {
-                    String request = queue.poll().toString();
-                    System.out.println(request);
-                    outToServer.writeUTF(request);
-                    response = inFromServer.readUTF();
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-         */
     }
 
     public void sendMessage(String message) {
         queue.add(message);
-        System.out.println(message);
+    }
+
+    private void handleResponses(DataInputStream inFromAH) throws IOException {
+
+        String response = inFromAH.readUTF();
+        System.out.println(response);
+
+
+        if (response.equals("Bid rejected")) {
+            System.out.println("Insufficient balance in account to place bid.");
+        }
+        else if (response.equals("Bid accepted")) {
+
+            System.out.println(response);
+            response = inFromAH.readUTF();
+
+            if (response.equals("winner")){}
+
+        }
+
+    }
+
+    private void finalizeAuction(String itemId) {
+
+        try {
+            Socket sockToBank = new Socket("127.0.0.1", 1234);
+            DataOutputStream outToBank = new DataOutputStream(sockToBank.getOutputStream());
+            DataInputStream inFromBank = new DataInputStream(sockToBank.getInputStream());
+
+            outToBank.writeUTF("Finalize " + itemId);
+            System.out.println(inFromBank.readUTF());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
     }
 }

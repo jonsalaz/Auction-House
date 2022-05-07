@@ -4,6 +4,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.net.Socket;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 public class AgentApplication {
@@ -31,13 +32,16 @@ public class AgentApplication {
             String instruction = query[0];
 
             switch (instruction) {
-                case("getAHs"): {
+                case("ah"): {
                     getAuctionHousesFromBank();
                     break;
                 }
                 case("bid"): {
                     submitBidToAH(query);
                     break;
+                }
+                case("items"): {
+                    getItemsFromAHs();
                 }
                 default: break;
             }
@@ -61,6 +65,7 @@ public class AgentApplication {
                 System.out.println(clientUsername + " is already registered with bank.");
             }
             else {
+                establishAHConnection(response);
                 System.out.println("An account with username " + clientUsername
                         + " has been registered with the bank!");
             }
@@ -68,7 +73,6 @@ public class AgentApplication {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
     private static void getAuctionHousesFromBank() {
@@ -84,8 +88,6 @@ public class AgentApplication {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-
     }
 
     /** Query format: Add AuctionHouse ####-####-.... where (#### is an AH port) */
@@ -124,7 +126,7 @@ public class AgentApplication {
     }
 
     private static void submitBidToAH(String[] userQuery) {
-        String auctionHouseId = userQuery[1];
+        Integer auctionHouseId = Integer.valueOf(userQuery[1]);
         String itemId = userQuery[2];
         String bidAmount = userQuery[3];
 
@@ -133,32 +135,21 @@ public class AgentApplication {
         ah.run();
     }
 
+    private static void getItemsFromAHs() {
+
+        for (Map.Entry<Integer, AHConnection> e : connectedAHs.entrySet()) {
+            AHConnection ah = e.getValue();
+            ah.sendMessage("items");
+            ah.run();
+        }
+
+    }
+
     /** Utility function for providing user with list of CL commands */
     private static void printUserCommands() {
         System.out.println("\nUser commands:");
-        System.out.println("Return list of active auction houses - getAHs");
+        System.out.println("Refresh connection to auction houses - ah");
         System.out.println("Bid on an item - bid auctionHouseId itemId bidAmount");
+        System.out.println("List items for sale by auction houses - items");
     }
-
-    /*
-    public void handleServerResponse(String response) {
-
-        String[] seperatedResponse = response.split(" ");
-        String clientInstruction = seperatedResponse[0];
-
-        switch(clientInstruction) {
-            case("AddAH"): {
-                establishAHConnection(response);
-                break;
-            }
-            case(""): {
-
-                break;
-            }
-            default:
-
-        }
-    }
-     */
-
 }
