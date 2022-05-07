@@ -1,6 +1,7 @@
 package AuctionHouse;
 
 import java.io.*;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.concurrent.Executors;
@@ -37,12 +38,10 @@ public class AHManager {
         System.out.println("Checking for finished auctions.");
         if(auctions.isEmpty()) return;
         for (Auction auction: auctions) {
-            System.out.println("Checking auction #: " + auction.getId());
             //After a 30 second delay, the auctions are checked for finalization.
             if(System.currentTimeMillis() - auction.getStartTime() > 30*1000) {
+                System.out.println("Closing auction #: " + auction.getId());
                 closeAuction(auction);
-                replaceAuction();
-                finalizeAuctions();
                 return;
             }
         }
@@ -50,12 +49,22 @@ public class AHManager {
 
     private void replaceAuction() {
         Random random = new Random();
-        this.auctions.add(options.get(random.nextInt(options.size())));
+        Auction replacement = options.get(random.nextInt(options.size()));
+        for(Auction auction: auctions) {
+            if(auction.getId() == replacement.getId()) {
+                replaceAuction();
+                return;
+            }
+        }
+//        System.out.println("Auction Replaced");
+        auctions.add(replacement);
     }
 
     private void closeAuction(Auction auction) {
         auctions.remove(auction);
         auction.finish();
+//        System.out.println("Replacing auction.");
+        replaceAuction();
     }
 
     private void initializeAuctions() {
@@ -78,9 +87,8 @@ public class AHManager {
                 line = reader.readLine();
             }
         } catch (IOException ignored) {}
-        Random random = new Random();
         for(int i = 0; i < 3; i++) {
-            auctions.add(options.get(random.nextInt(options.size())));
+            replaceAuction();
         }
     }
 
@@ -91,6 +99,49 @@ public class AHManager {
             }
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+    // bid user itemID amount
+    public void bidHandler(DataOutputStream out, String user, int id, long amount, int port) {
+        //Search for auction with matching ID.
+        for(Auction auction: auctions) {
+            if(auction.getId() == id) {
+                //Check if bid amount is higher than current auctions bid amount.
+                if(auction.getCurrentBid() < amount) {
+                    try {
+                        //Connect with bank to make a request.
+                        Socket bank = new Socket("127.0.0.1", 1234);
+                        DataOutputStream outBank = new DataOutputStream(bank.getOutputStream());
+                        DataInputStream inBank = new DataInputStream(bank.getInputStream());
+                        // Bid request provided to bank.
+                        outBank.writeUTF("Bid " + user + " " + port + " " + id + " " + amount);
+                        //Bank response provided to user.
+                        String status = inBank.readUTF();
+                        if(status.equalsIgnoreCase("Bid accepted")) {
+                            auction.setCurrentBid(amount);
+                            auction.setWinner(out);
+                        }
+                        out.writeUTF(status);
+                    } catch (IOException e) {
+                        System.out.println("Cannot connect to bank");
+                        try {
+                            out.writeUTF("Bid rejected");
+                        } catch (Exception ignored) {
+                            System.out.println("Connection to user lost");
+                        }
+                    }
+                }
+                // If requested bid amount is lower than current bid amount, reject bid.
+                else {
+                    try {
+                        out.writeUTF("Bid rejected");
+                    } catch (Exception ignored) {
+                        System.out.println("Connection to user lost.");
+                    }
+                }
+                //Once correct auction is found. Break.
+                break;
+            }
         }
     }
 }

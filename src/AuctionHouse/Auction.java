@@ -10,7 +10,7 @@ public class Auction {
     private int value;
     private float currentBid;
     private long startTime;
-    private Socket winner;
+    private DataOutputStream winner;
 
     public Auction(int id, String name, int value, long startTime) {
         this.id = id;
@@ -40,8 +40,8 @@ public class Auction {
      * Getter function for the current bid.
      * @return The Current bid of the auction.
      */
-    public int getCurrentBid() {
-        return value;
+    public float getCurrentBid() {
+        return currentBid;
     }
 
     /**
@@ -58,9 +58,16 @@ public class Auction {
     public void finish() {
         if(winner != null){
             try {
-                DataOutputStream out = new DataOutputStream(new BufferedOutputStream(winner.getOutputStream()));
-                out.writeUTF("win " + this.id);
+                winner.writeUTF("win " + this.id);
             } catch (Exception ignored) {}
         }
+    }
+
+    public void setWinner(DataOutputStream winner) {
+        this.winner = winner;
+    }
+
+    public void setCurrentBid(float currentBid) {
+        this.currentBid = currentBid;
     }
 }
