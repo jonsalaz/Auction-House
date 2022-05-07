@@ -36,7 +36,7 @@ public class AHConnection implements Runnable {
 
                 outToAH.writeUTF(requesttoAH);
                 //String responseFromAH = inFromAH.readUTF();
-                handleResponses(inFromAH);
+                handleResponses(inFromAH, requesttoAH);
             }
 
         } catch (Exception e){
@@ -48,11 +48,27 @@ public class AHConnection implements Runnable {
         queue.add(message);
     }
 
-    private void handleResponses(DataInputStream inFromAH) throws IOException {
+    private void handleResponses(DataInputStream inFromAH, String request) throws IOException {
+        String[] query = request.split(" ");
+        String instruction = query[0];
+
         String response = inFromAH.readUTF();
         System.out.println(response);
 
+        switch (instruction) {
+            case("items"): {
+                itemsResponse(response);
+            }
+            case("bid"): {
+                bidResponse(response, inFromAH);
+            }
 
+
+        }
+
+    }
+
+    private void bidResponse(String response, DataInputStream inFromAH) throws IOException {
         if (response.equals("Bid rejected")) {
             System.out.println("Insufficient balance in account to place bid.");
         }
@@ -66,7 +82,14 @@ public class AHConnection implements Runnable {
             }
 
         }
+    }
 
+    /** Utility function to print  */
+    private void itemsResponse(String response) {
+        System.out.println("----------------------");
+        System.out.println("Auctions for AH#" + port);
+        System.out.println(response);
+        System.out.println("----------------------");
     }
 
     private void finalizeAuction(String itemId) {
