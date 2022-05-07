@@ -79,7 +79,7 @@ public class BankManager {
         if (!accounts.containsKey(clientId)) {
             if (clientType.equals("AuctionHouse")) {
                 System.out.println("Registering AH");
-                accounts.put(clientId, Long.valueOf(0));
+                accounts.put(clientId, 0L);
                 auctionHousePorts.add(Integer.valueOf(clientId));
                 outputStream.writeUTF("Registration successful");
             }
@@ -91,7 +91,7 @@ public class BankManager {
 
                 if (auctionHousePorts.size() > 0) {
                     System.out.println("Sending AH address to client");
-                    outputStream.writeUTF("Register AuctionHouse " + getFormattedPorts());
+                    outputStream.writeUTF("Add AuctionHouse "+ getFormattedPorts());
                 }
                 else {
                     outputStream.writeUTF("No auction houses found");
@@ -179,9 +179,15 @@ public class BankManager {
     /** Utility function to return list of ports as dash seperated string */
     private String getFormattedPorts() {
         String portString = "";
-        for (Integer i : auctionHousePorts) {
-            portString += i + "-";
 
+        if (auctionHousePorts.size() <= 1) {
+            for (Integer i : auctionHousePorts) portString += i;
+        }
+        else {
+            for (Integer i : auctionHousePorts) {
+                portString += i + "-";
+
+            }
         }
         return portString;
     }
