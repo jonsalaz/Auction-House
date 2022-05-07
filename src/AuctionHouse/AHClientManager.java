@@ -21,6 +21,7 @@ public class AHClientManager implements Runnable {
     public void run() {
         try {
             DataInputStream in = new DataInputStream(new BufferedInputStream(client.getInputStream()));
+            DataOutputStream out;
             String request = "";
             while(!request.toLowerCase(Locale.ROOT).equals("quit")) {
                 request = in.readUTF();
@@ -29,13 +30,14 @@ public class AHClientManager implements Runnable {
                 switch(request) {
                     //Request for listed items.
                     case("items"):
-                        DataOutputStream out =
-                                new DataOutputStream(new BufferedOutputStream(client.getOutputStream()));
+                        out = new DataOutputStream(new BufferedOutputStream(client.getOutputStream()));
                         manager.provideListings(out);
                         break;
                     //Request to place bid.
                     case("bid"):
-                        //TODO Bidding logic.
+                        // bid user itemID amount
+                        out = new DataOutputStream(new BufferedOutputStream(client.getOutputStream()));
+                        manager.bidHandler(out, details[1], Integer.parseInt(details[2]), Long.parseLong(details[3]));
                         break;
                     //Request to disconnect from auction house.
                     case("quit"):
