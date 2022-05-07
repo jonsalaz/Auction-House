@@ -61,6 +61,9 @@ public class Auction {
                 winner.writeUTF("win " + this.id);
             } catch (Exception ignored) {}
         }
+        this.currentBid = value;
+        this.startTime = System.currentTimeMillis();
+        this.winner = null;
     }
 
     public void setWinner(DataOutputStream winner) {
