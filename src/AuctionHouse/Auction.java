@@ -1,8 +1,7 @@
 package AuctionHouse;
 
-import java.io.BufferedOutputStream;
 import java.io.DataOutputStream;
-import java.net.Socket;
+import java.io.IOException;
 
 public class Auction {
     private int id;
@@ -65,6 +64,11 @@ public class Auction {
     }
 
     public void setWinner(DataOutputStream winner) {
+        if(this.winner != null) {
+            try {
+                winner.writeUTF("Outbid");
+            } catch (IOException e) {}
+        }
         this.winner = winner;
     }
 
