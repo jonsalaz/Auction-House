@@ -89,7 +89,7 @@ public class AHConnection implements Runnable {
     private void itemsResponse(String response) {
         System.out.println("----------------------");
         System.out.println("Auctions for AH#" + port);
-        System.out.println(response);
+        System.out.print(response);
         System.out.println("----------------------\n");
     }
 

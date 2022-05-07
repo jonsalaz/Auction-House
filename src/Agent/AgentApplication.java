@@ -149,7 +149,7 @@ public class AgentApplication {
     private static void printUserCommands() {
         System.out.println("\nUser commands:");
         System.out.println("Refresh connection to auction houses - ah");
-        System.out.println("Bid on an item - bid auctionHouseId itemId bidAmount");
         System.out.println("List items for sale by auction houses - items");
+        System.out.println("Bid on an item - bid auctionHouseId itemId bidAmount");
     }
 }
