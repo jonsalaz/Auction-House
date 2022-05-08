@@ -132,8 +132,14 @@ public class AgentApplication {
         String bidAmount = userQuery[3];
 
         AHConnection ah = connectedAHs.get(auctionHouseId);
-        ah.sendMessage("bid " + clientUsername + " " + itemId + " " + bidAmount);
-        ah.run();
+
+        try {
+            ah.sendMessage("bid " + clientUsername + " " + itemId + " " + bidAmount);
+            ah.run();
+        } catch (Exception e) {
+            System.out.println("Bid submitted is invalid.");
+        }
+
     }
 
     private static void getItemsFromAHs() {
