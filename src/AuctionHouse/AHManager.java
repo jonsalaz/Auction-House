@@ -100,9 +100,14 @@ public class AHManager {
                 if(auction.getStartTime() <= 0) {
                     continue;
                 }
-                stringBuilder.append(auction.getId()).append(" ")
-                        .append(auction.getName()).append(" ").append(auction.getCurrentBid()).append(" ")
-                        .append((30*1000 - (System.currentTimeMillis() - auction.getStartTime()) ) / 1000).append("\n");
+                // This is not ideal but string builder does not appear to have an appendFormat method
+                String s = String.format("%-15s %-15s %-15s %-15s\n",
+                        auction.getId(),
+                        auction.getName(),
+                        "$" + auction.getCurrentBid(),
+                        (30*1000 - (System.currentTimeMillis() - auction.getStartTime()) ) / 1000 + "s"
+                        );
+                stringBuilder.append(s);
             }
             out.writeUTF(stringBuilder.toString());
         } catch (Exception e) {

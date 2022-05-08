@@ -68,11 +68,12 @@ public class AgentApplication {
 
             if (response.equals("Invalid username")) {
                 System.out.println(clientUsername + " is already registered with bank.");
+                System.exit(1);
             }
             else {
                 establishAHConnection(response);
                 System.out.println("An account with username " + clientUsername
-                        + " has been registered with the bank!");
+                        + " has been registered with the bank!\n");
             }
 
         } catch (Exception e) {
@@ -164,7 +165,7 @@ public class AgentApplication {
 
     /** Utility function for providing user with list of CL commands */
     private static void printUserCommands() {
-        System.out.println("\nUser commands:");
+        System.out.println("User commands:");
         System.out.println("Refresh connection to auction houses - ah");
         System.out.println("List items for sale by auction houses - items");
         System.out.println("Bid on an item - bid auctionHouseId itemId bidAmount");

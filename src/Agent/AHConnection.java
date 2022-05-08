@@ -85,10 +85,13 @@ public class AHConnection implements Runnable {
 
     /** Utility function to print AH items   */
     private void itemsResponse(String response) {
-        System.out.println("----------------------");
-        System.out.println("Auctions for AH ID: " + port);
+        // Do not want to import StringUtils
+        System.out.println("------------------------AH ID: "
+                + port + "------------------------");
+        System.out.printf("%-15s %-15s %-15s %-15s\n", "ItemId", "Item Name", "Current Bid", "Time remaining");
         System.out.print(response);
-        System.out.println("----------------------\n");
+        System.out.println("------------------------------" +
+                "-----------------------------\n");
     }
 
     /** Parameters: itemID is used as ID of transaction by bank
