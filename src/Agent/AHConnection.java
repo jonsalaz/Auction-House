@@ -48,9 +48,7 @@ public class AHConnection implements Runnable {
                 handleResponses(inFromAH, requestToAH);
             }
 
-        } catch (Exception e){
-            e.printStackTrace();
-        }
+        } catch (Exception e){}
     }
 
     /** Allows agent to add request to AHConnection queue */

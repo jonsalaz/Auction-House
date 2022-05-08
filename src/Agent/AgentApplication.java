@@ -52,6 +52,7 @@ public class AgentApplication {
                     getItemsFromAHs();
                 }
                 default:
+                    System.out.println("Invalid command");
                     break;
             }
         }
@@ -146,10 +147,17 @@ public class AgentApplication {
      * When user submits bid via CL, ensure that bid is valid and if so let
      * AHConnection thread handle request */
     private static void submitBidToAH(String[] userQuery) {
-        Integer auctionHouseId = Integer.valueOf(userQuery[1]);
-        String itemId = userQuery[2];
-        String bidAmount = userQuery[3];
-
+        Integer auctionHouseId;
+        String itemId;
+        String bidAmount;
+        try {
+            auctionHouseId = Integer.valueOf(userQuery[1]);
+            itemId = userQuery[2];
+            bidAmount = userQuery[3];
+        } catch(IndexOutOfBoundsException e) {
+            System.out.println("Please submit a bid in the valid format.");
+            return;
+        }
         AHConnection ah = connectedAHs.get(auctionHouseId);
 
         try {
@@ -168,8 +176,8 @@ public class AgentApplication {
             AHConnection ah = e.getValue();
             ah.sendMessage("items");
             ah.run();
-            printUserCommands();
         }
+        printUserCommands();
     }
 
     /** Utility function for providing user with list of CL commands */
