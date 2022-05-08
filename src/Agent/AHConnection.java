@@ -32,11 +32,9 @@ public class AHConnection implements Runnable {
     public void run() {
         try {
             while (!queue.isEmpty()) {
-                String requesttoAH = queue.poll().toString();
-
-                outToAH.writeUTF(requesttoAH);
-                //String responseFromAH = inFromAH.readUTF();
-                handleResponses(inFromAH, requesttoAH);
+                String requestToAH = queue.poll().toString();
+                outToAH.writeUTF(requestToAH);
+                handleResponses(inFromAH, requestToAH);
             }
 
         } catch (Exception e){
@@ -51,9 +49,7 @@ public class AHConnection implements Runnable {
     private void handleResponses(DataInputStream inFromAH, String request) throws IOException {
         String[] query = request.split(" ");
         String instruction = query[0];
-        System.out.println("HANDLE RESPONSE NOW");
         String response = inFromAH.readUTF();
-        System.out.println("RETURNED: " + response);
 
         switch (instruction) {
             case("items"): {
@@ -87,16 +83,18 @@ public class AHConnection implements Runnable {
         }
     }
 
-    /** Utility function to print  */
+    /** Utility function to print AH items   */
     private void itemsResponse(String response) {
         System.out.println("----------------------");
-        System.out.println("Auctions for AH#" + port);
+        System.out.println("Auctions for AH ID: " + port);
         System.out.print(response);
         System.out.println("----------------------\n");
     }
 
+    /** Parameters: itemID is used as ID of transaction by bank
+     * When notified that an auction w/ agent bid has ended,
+     *  tell bank to finalize transaction and transfer funds from agent to AH */
     private void finalizeAuction(String itemId) {
-
         try {
             Socket sockToBank = new Socket("127.0.0.1", 1234);
             DataOutputStream outToBank = new DataOutputStream(sockToBank.getOutputStream());
@@ -109,6 +107,14 @@ public class AHConnection implements Runnable {
             e.printStackTrace();
         }
 
+    }
 
+    /** Close data streams and port when agent submits quit command to CL */
+    public void terminateConnection() {
+        try {
+            inFromAH.close();
+            outToAH.close();
+            sockToAH.close();
+        } catch (Exception e){}
     }
 }

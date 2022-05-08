@@ -133,14 +133,10 @@ public class BankManager {
         String itemId = query[3];
         Long bidAmount = Long.valueOf(query[4]);
 
-        System.out.println("print1");
-
         if (accounts.containsKey(agentId) && accounts.containsKey(auctionId)) {
-            System.out.println("print2");
 
             /** if bid is more than agent has in account, reject */
             if (bidAmount > accounts.get(agentId)) {
-                System.out.println("PRINT ERROR");
                 outputStream.writeUTF("Bid rejected");
                 outputStream.close();
                 return;
@@ -149,10 +145,8 @@ public class BankManager {
             System.out.println(bidsInEscrow.containsKey(itemId));
             /** if previous bids exist on item, must free funds */
             if (bidsInEscrow.containsKey(itemId)) {
-                System.out.println("FREEING FUNDS");
                 freeFunds(itemId);
             }
-            System.out.println("DONE FREEING FUNDS");
 
             /** hold agent's funds & update agents account balance */
             Transaction newBid = new Transaction(agentId, auctionId, bidAmount);
@@ -163,7 +157,6 @@ public class BankManager {
             accounts.put(agentId, agentBalance);
             outputStream.writeUTF("Bid accepted");
         }
-        System.out.println("print4");
         outputStream.close();
     }
 

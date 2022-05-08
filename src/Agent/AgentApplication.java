@@ -47,8 +47,12 @@ public class AgentApplication {
                     break;
             }
         }
+
+        terminateAHConnections();
     }
 
+    /** Upon creation of agent, register an account with the bank using
+     * CLA specified agent username & initial balance */
     private static void registerWithBank() {
         try {
             Socket sockToBank = new Socket("127.0.0.1", 1234);
@@ -76,6 +80,7 @@ public class AgentApplication {
         }
     }
 
+    /** Retrieve a list of AH ports from bank & establish AH connection */
     private static void getAuctionHousesFromBank() {
         try {
             Socket sockToBank = new Socket("127.0.0.1", 1234);
@@ -91,7 +96,9 @@ public class AgentApplication {
         }
     }
 
-    /** Query format: Add AuctionHouse ####-####-.... where (#### is an AH port) */
+    /** Query format: Add AuctionHouse ####-####-.... where (#### is an AH port)
+     * parse port string provided by bank & for e/a port, establish a new
+     * connection from agent to AH by initializing AHConnection */
     private static void establishAHConnection(String query) {
 
         if (!query.contains("returnAH")) {
@@ -126,6 +133,8 @@ public class AgentApplication {
         }
     }
 
+    /** When user submits bid via CL, ensure that bid is valid and if so let
+     * AHConnection thread handle request */
     private static void submitBidToAH(String[] userQuery) {
         Integer auctionHouseId = Integer.valueOf(userQuery[1]);
         String itemId = userQuery[2];
@@ -142,14 +151,15 @@ public class AgentApplication {
 
     }
 
+    /** When user requests list of items from AH, let AHConnection thread
+     * handle fetch */
     private static void getItemsFromAHs() {
-
         for (Map.Entry<Integer, AHConnection> e : connectedAHs.entrySet()) {
             AHConnection ah = e.getValue();
             ah.sendMessage("items");
             ah.run();
+            printUserCommands();
         }
-
     }
 
     /** Utility function for providing user with list of CL commands */
@@ -158,5 +168,13 @@ public class AgentApplication {
         System.out.println("Refresh connection to auction houses - ah");
         System.out.println("List items for sale by auction houses - items");
         System.out.println("Bid on an item - bid auctionHouseId itemId bidAmount");
+        System.out.println("Terminate program - quit");
+    }
+
+    private static void terminateAHConnections() {
+        for (Map.Entry<Integer, AHConnection> e : connectedAHs.entrySet()) {
+            AHConnection ahConnection = e.getValue();
+            ahConnection.terminateConnection();
+        }
     }
 }

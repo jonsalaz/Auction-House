@@ -68,7 +68,6 @@ public class Auction {
 
     public void setWinner(DataOutputStream winner) {
         if(this.winner != null) {
-            System.out.println("THERE WAS AN OUTBID");
             try {
                 this.winner.writeUTF("Outbid " + this.id);
             } catch (IOException ignored) {}
