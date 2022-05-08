@@ -1,0 +1,29 @@
+AgentApplication: Main method for agent, responsible for parsing user input, registering agent account with bank,
+and initializing AH connections to handle user requests
+
+AHConnection: Implements Runnable to handle each of agent's auction house connection's requests on separate thread,
+by receiving message stating request parameters from agent & sending request to bank. Parses response from AH
+and outputs to console.
+
+AuctionHouseApplication: Main class for AH, responsible for getting port from user & registering account for AH with
+bank, then listens for incoming client requests from new agent
+
+AHClientManager: Threadable object which, handed a client or bank socket, opens an output stream & hands request off
+ to a request manager which handles response to client
+
+AHManager: Responsible for receiving agent requests from AHClientManager, processing these requests and responding
+to the corresponding AHConnection object.
+
+Auction: Entity class for item auction, keeps auction parameters (id, name, value) as well as the current bid price,
+starting time of bid, and writes to AHConnection in case of an outbid or winning bid
+
+BankApplication: Main method for bank, responsible for listening to incoming connection
+requests from clients (AHs, Agents)
+
+BankClientManager: Unique instance for e/a client which connects to bank, hands socket off to bank manager
+to handle requests
+
+BankManager: Responsible for parsing & handling incoming client requests from e/a threaded BankClientManager
+and sending response to client
+
+Transaction: Container class to hold transactions of bids while auction ongoing
