@@ -31,7 +31,8 @@ public class BankApplication {
                     Socket clientSocket = serverSocket.accept();
                     System.out.println("ACCEPTED CLIENT\n");
                     BankClientManager clientManager = new BankClientManager(clientSocket, bankManager);
-                    clientManager.run();
+                    Thread thread = new Thread(clientManager);
+                    thread.start();
 
                     serverSocket.close();
                 }
