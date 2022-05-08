@@ -2,6 +2,8 @@
  * BankManager: Responsible for parsing &
  * handling incoming client requests from e/a
  * threaded BankClientManager and sending response to client
+ *
+ * Transaction: Container class to hold transactions of bids while auction ongoing
  *  */
 
 

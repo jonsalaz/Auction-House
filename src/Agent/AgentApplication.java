@@ -1,6 +1,6 @@
 /** Jonathan Salazar , Cyrus McCormick
- * AgentApplication: Main method for agent,e
- *  * responsible for parsing user input,
+ * AgentApplication: Main method for agent,
+ *  responsible for parsing user input,
  *  registering agent account with bank,
  *  and initializing AH connections to handle
  *  user requests
