@@ -1,3 +1,12 @@
+/** Jonathan Salazar , Cyrus McCormick
+ * Auction: Entity class for item auction,
+ * keeps auction parameters (id, name, value)
+ * as well as the current bid price, starting time of bid,
+ * and writes to AHConnection in case of an outbid
+ * or winning bid
+ */
+
+
 package AuctionHouse;
 
 import java.io.DataOutputStream;
@@ -66,6 +75,8 @@ public class Auction {
         this.winner = null;
     }
 
+    /** Update winner to current highest bidder, if bidder already exists,
+     * respond telling AHConnection that agent has been outbid */
     public void setWinner(DataOutputStream winner) {
         if(this.winner != null) {
             try {
@@ -75,10 +86,12 @@ public class Auction {
         this.winner = winner;
     }
 
+    /** Updates current bid amount */
     public void setCurrentBid(float currentBid) {
         this.currentBid = currentBid;
     }
 
+    /** Sets starting time of auction so timer can be used to dictate length of auction */
     public void setStartTime(long currentTimeMillis) {
         this.startTime = currentTimeMillis;
     }

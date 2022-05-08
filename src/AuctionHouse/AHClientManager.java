@@ -1,10 +1,14 @@
+/** Jonathan Salazar , Cyrus McCormick
+ * AHClientManager: Threadable object
+ * which, handed a client or bank socket, opens
+ * an output stream & hands request off to
+ * a request manager which handles response to client
+ */
+
 package AuctionHouse;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Locale;
 
@@ -20,6 +24,8 @@ public class AHClientManager implements Runnable {
         this.manager = manager;
     }
 
+    /** Parses client request & hand request off to manager function to handle processing and
+     * response to cleint */
     @Override
     public void run() {
         try {

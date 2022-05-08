@@ -1,3 +1,10 @@
+/** Jonathan Salazar , Cyrus McCormick
+ * AHManager: Responsible for receiving agent requests
+ * from AHClientManager, processing these requests
+ * and responding to the corresponding AHConnection object.
+ *
+ */
+
 package AuctionHouse;
 
 import java.io.*;
@@ -13,6 +20,9 @@ public class AHManager {
     private ScheduledExecutorService auctionTimer;
     private ArrayList<Auction> options;
 
+    /** Creates initial auctions & responsibility of checking if
+     * an auction has completed to separate thread, this allows
+     * continuous condition checks on auction to decide if it's finished */
     public AHManager() {
         initializeAuctions();
         this.auctionTimer = Executors.newSingleThreadScheduledExecutor();
@@ -34,19 +44,19 @@ public class AHManager {
         }
     }
 
+    /** For each auction, check whether auction time has decayed & close auction if so */
     private void finalizeAuctions() {
-        //System.out.println("Checking for finished auctions.");
         if(auctions.isEmpty()) return;
         for (Auction auction: auctions) {
             //After a 30 second delay, the auctions are checked for finalization.
             if(System.currentTimeMillis() - auction.getStartTime() > 30*1000) {
-                //System.out.println("Closing auction #: " + auction.getId());
                 closeAuction(auction);
                 return;
             }
         }
     }
 
+    /** When one auction expires, create another to replace it */
     private void replaceAuction() {
         Random random = new Random();
         Auction replacement = options.get(random.nextInt(options.size()));
@@ -57,17 +67,18 @@ public class AHManager {
                 return;
             }
         }
-//        System.out.println("Auction Replaced");
         auctions.add(replacement);
     }
 
+    /** When one auction expires, create another to replace it */
     private void closeAuction(Auction auction) {
         auctions.remove(auction);
         auction.finish();
-//        System.out.println("Replacing auction.");
         replaceAuction();
     }
 
+    /** Parses lines containing item parameters from items file,
+     * initializes new auction object and adds it to options list */
     private void initializeAuctions() {
         this.auctions = new ArrayList<>();
         this.options = new ArrayList<>();
@@ -93,6 +104,8 @@ public class AHManager {
         }
     }
 
+    /** When an AHConnection requests a list of current auction items,
+     * build a formatted string of current auctions to respond with */
     public void provideListings(DataOutputStream out) {
         StringBuilder stringBuilder = new StringBuilder();
         try {
@@ -115,7 +128,12 @@ public class AHManager {
         }
     }
 
-    // bid user itemID amount
+    /** Request format: bid user itemID amount
+     *  Responsible for handling AHConnection bid request,
+     *  for each auction check if match with requested ID, if so
+     *  determine if bid is valid. If bid is valid communicate bid to bank,
+     *  send first response to AHConnection that bid is accepted then
+     *  second response stating auction was either won or outbid */
     public void bidHandler(DataOutputStream out, String user, int id, long amount, int port) {
         //Search for auction with matching ID.
         for(Auction auction: auctions) {

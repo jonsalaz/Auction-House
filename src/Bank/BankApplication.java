@@ -1,3 +1,9 @@
+/** Jonathan Salazar , Cyrus McCormick
+ * BankApplication: Main method for bank,
+ * responsible for listening to incoming connection
+ * requests from clients (AHs, Agents)
+ */
+
 package Bank;
 
 import java.io.IOException;
@@ -13,6 +19,7 @@ public class BankApplication {
         clientConnect();
     }
 
+    /** Listen for client connections to bank server */
     static void clientConnect() {
 
             try {

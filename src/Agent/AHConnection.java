@@ -1,3 +1,12 @@
+/** Jonathan Salazar , Cyrus McCormick
+ * AHConnection: Implements Runnable to handle
+ * each of agent's auction house connection's
+ * requests on seperate thread, by receiving message
+ * stating request parameters from agent & sending
+ * request to bank. Parses response from AH and outputs
+ * to console.
+ */
+
 package Agent;
 
 import java.io.DataInputStream;
@@ -24,10 +33,12 @@ public class AHConnection implements Runnable {
             this.outToAH = new DataOutputStream(sockToAH.getOutputStream());
             this.inFromAH = new DataInputStream(sockToAH.getInputStream());
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Connection refused.");
         }
     }
 
+    /** Runnable task writes request to AH and hands
+     *  response off to response handler function */
     @Override
     public void run() {
         try {
@@ -42,10 +53,12 @@ public class AHConnection implements Runnable {
         }
     }
 
+    /** Allows agent to add request to AHConnection queue */
     public void sendMessage(String message) {
         queue.add(message);
     }
 
+    /** Parses AH responses and hands off to appropriate function */
     private void handleResponses(DataInputStream inFromAH, String request) throws IOException {
         String[] query = request.split(" ");
         String instruction = query[0];
@@ -63,9 +76,11 @@ public class AHConnection implements Runnable {
         }
     }
 
+    /** Given response & input stream, decide if bid was accepted, if so,
+     * wait until bid is either outbid or won */
     private void bidResponse(String response, DataInputStream inFromAH) throws IOException {
         if (response.equalsIgnoreCase("Bid rejected")) {
-            System.out.println("Insufficient balance in account to place bid.");
+            System.out.println("Bid was rejected");
         }
         else if (response.equalsIgnoreCase("Bid accepted")) {
             System.out.println(response);
@@ -115,6 +130,7 @@ public class AHConnection implements Runnable {
     /** Close data streams and port when agent submits quit command to CL */
     public void terminateConnection() {
         try {
+            System.out.println("Terminating connection to AH #" + port);
             inFromAH.close();
             outToAH.close();
             sockToAH.close();

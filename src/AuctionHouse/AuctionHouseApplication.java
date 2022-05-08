@@ -1,3 +1,10 @@
+/** Jonathan Salazar , Cyrus McCormick
+ * AuctionHouseApplication: Main class for AH,
+ * responsible for getting port from user & registering account
+ * for AH with bank, then listens for incoming
+ * client requests from new agent
+ */
+
 package AuctionHouse;
 
 import java.io.*;
@@ -22,6 +29,7 @@ public class AuctionHouseApplication {
 
         AHManager manager = new AHManager();
 
+        /** Accepts incoming client connections from agents */
         ServerSocket server;
         try {
             server = new ServerSocket(port);
@@ -38,6 +46,8 @@ public class AuctionHouseApplication {
         }
     }
 
+    /** Prompts user for port & if port not already in use by another AH,
+     * register an account with bank where accountID is == port */
     private static int BankRegistration(Socket bank) {
         int port = -1;
         DataOutputStream out;

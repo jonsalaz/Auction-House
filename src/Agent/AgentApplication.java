@@ -1,3 +1,11 @@
+/** Jonathan Salazar , Cyrus McCormick
+ * AgentApplication: Main method for agent,e
+ *  * responsible for parsing user input,
+ *  registering agent account with bank,
+ *  and initializing AH connections to handle
+ *  user requests
+ */
+
 package Agent;
 
 import java.io.DataInputStream;
@@ -134,7 +142,8 @@ public class AgentApplication {
         }
     }
 
-    /** When user submits bid via CL, ensure that bid is valid and if so let
+    /** Query format: bid AHID ItemID bidAmount
+     * When user submits bid via CL, ensure that bid is valid and if so let
      * AHConnection thread handle request */
     private static void submitBidToAH(String[] userQuery) {
         Integer auctionHouseId = Integer.valueOf(userQuery[1]);
@@ -172,6 +181,7 @@ public class AgentApplication {
         System.out.println("Terminate program - quit");
     }
 
+    /** Tell AHConnection to terminate sockets & data streams */
     private static void terminateAHConnections() {
         for (Map.Entry<Integer, AHConnection> e : connectedAHs.entrySet()) {
             AHConnection ahConnection = e.getValue();

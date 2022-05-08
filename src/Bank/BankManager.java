@@ -1,3 +1,10 @@
+/** Jonathan Salazar , Cyrus McCormick
+ * BankManager: Responsible for parsing &
+ * handling incoming client requests from e/a
+ * threaded BankClientManager and sending response to client
+ *  */
+
+
 package Bank;
 
 import java.io.DataInputStream;
@@ -40,9 +47,8 @@ public class BankManager {
     private HashMap<String, Transaction> bidsInEscrow = new HashMap<>();
     private List<Integer> auctionHousePorts = new ArrayList<>();
 
-    public BankManager() {
-    }
-    
+    /** Provided socket by BankClientManager thread, parse client instruction & call appropriate request
+     * handler function */
     public void handleClientRequest(Socket clientSock) {
 
         try {
@@ -84,7 +90,8 @@ public class BankManager {
         }
     }
 
-    /** Query format: Register ClientType ClientId (Optional: ClientInitBalance) */
+    /** Query format: Register ClientType ClientId (Optional: ClientInitBalance)
+     * If account does not exist w/ provided ID, register AH and agent accounts */
     private void registerAccount(Socket clientSock, String[] query) throws IOException {
         DataOutputStream outputStream = new DataOutputStream(clientSock.getOutputStream());
         String clientType = query[1];
@@ -125,42 +132,50 @@ public class BankManager {
         outputStream.close();
     }
 
-    /** Query format: Bid AgentId AuctionHouseId ItemId BidAmount */
-    private void setAuctionBid(Socket clientSock, String[] query) throws IOException {
-        DataOutputStream outputStream = new DataOutputStream(clientSock.getOutputStream());
-        String agentId = query[1];
-        String auctionId = query[2];
-        String itemId = query[3];
-        Long bidAmount = Long.valueOf(query[4]);
+    /** Query format: Bid AgentId AuctionHouseId ItemId BidAmount
+     * Handle bid request, if account of AH & agent valid reject bid if agent balance
+     * is too low, refund previous high bid if one exists, hold current bidder's funds */
+    private void setAuctionBid(Socket clientSock, String[] query) {
+        try {
+            DataOutputStream outputStream = new DataOutputStream(clientSock.getOutputStream());
+            String agentId = query[1];
+            String auctionId = query[2];
+            String itemId = query[3];
+            Long bidAmount = Long.valueOf(query[4]);
 
-        if (accounts.containsKey(agentId) && accounts.containsKey(auctionId)) {
+            if (accounts.containsKey(agentId) && accounts.containsKey(auctionId)) {
 
-            /** if bid is more than agent has in account, reject */
-            if (bidAmount > accounts.get(agentId)) {
-                outputStream.writeUTF("Bid rejected");
-                outputStream.close();
-                return;
+                /** if bid is more than agent has in account, reject */
+                if (bidAmount > accounts.get(agentId)) {
+                    outputStream.writeUTF("Bid rejected");
+                    outputStream.close();
+                    return;
+                }
+
+                System.out.println(bidsInEscrow.containsKey(itemId));
+                /** if previous bids exist on item, must free funds */
+                if (bidsInEscrow.containsKey(itemId)) {
+                    freeFunds(itemId);
+                }
+
+                /** hold agent's funds & update agents account balance */
+                Transaction newBid = new Transaction(agentId, auctionId, bidAmount);
+                bidsInEscrow.put(itemId, newBid);
+
+                Long agentBalance = accounts.get(agentId);
+                agentBalance -= bidAmount;
+                accounts.put(agentId, agentBalance);
+                outputStream.writeUTF("Bid accepted");
             }
-
-            System.out.println(bidsInEscrow.containsKey(itemId));
-            /** if previous bids exist on item, must free funds */
-            if (bidsInEscrow.containsKey(itemId)) {
-                freeFunds(itemId);
-            }
-
-            /** hold agent's funds & update agents account balance */
-            Transaction newBid = new Transaction(agentId, auctionId, bidAmount);
-            bidsInEscrow.put(itemId, newBid);
-
-            Long agentBalance = accounts.get(agentId);
-            agentBalance -= bidAmount;
-            accounts.put(agentId, agentBalance);
-            outputStream.writeUTF("Bid accepted");
+            outputStream.close();
+        } catch (Exception e) {
+            System.out.println("Socket closed\n");
         }
-        outputStream.close();
     }
 
-    /** Query format: Finalize ItemId */
+    /** Query format: Finalize ItemId
+     * Given itemId (used as Transaction ID), move highest bid amount to AH accounts, delete
+     * bid */
     private void finalizeAuction(Socket clientSock, String[] query) throws IOException {
         DataOutputStream outputStream = new DataOutputStream(clientSock.getOutputStream());
         String itemId = query[1];
@@ -192,6 +207,7 @@ public class BankManager {
         accounts.put(prevTransaction.getAgentId(), updatedAgentBalance);
     }
 
+    /** Provide client with formatted list of auction house ports on request */
     private void getAuctionHouses(Socket clientSock) throws IOException {
         DataOutputStream outputStream =
                 new DataOutputStream(clientSock.getOutputStream());
@@ -221,6 +237,7 @@ public class BankManager {
         return portString;
     }
 
+    /** Print incoming client request to console */
     public void printRequest(String[] req) {
         for (String s : req) System.out.print(s+ " ");
         System.out.println();

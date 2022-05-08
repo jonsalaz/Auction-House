@@ -1,3 +1,9 @@
+/** Jonathan Salazar , Cyrus McCormick
+ * BankClientManager: Unique instance for e/a
+ * client which connects to bank, hands socket off
+ * to bank manager to handle requests
+ *  */
+
 package Bank;
 
 import java.net.Socket;
@@ -12,17 +18,12 @@ public class BankClientManager implements Runnable{
         this.bankManager = bankManager;
     }
 
+    /** Hand client socket off to bank manager for request management */
     @Override
     public void run() {
         try {
-
             bankManager.handleClientRequest(socket);
-            //System.out.println("close client socket.");
-            //socket.close();
         } catch (Exception e) {}
 
     }
-
-
-
 }
