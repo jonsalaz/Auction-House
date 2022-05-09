@@ -13,15 +13,25 @@ import java.net.Socket;
 import java.util.Scanner;
 
 public class AuctionHouseApplication {
+
+    private static String host = "127.0.0.1";
+    private static Integer bankPort = 1234;
+
     public static void main(String[] args) {
+
+        if (args.length > 0) {
+            host = args[0];
+            if (args.length == 2) bankPort = Integer.parseInt(args[1]);
+        }
+
         Socket bank = null;
-        int port = -1;
+        int ahPort = -1;
 
         // Register with the bank and request a port.
         try {
-            bank = new Socket("127.0.0.1", 1234);
+            bank = new Socket(host, bankPort);
             /** port = BankRegistration(bank); */
-            port = BankRegistration(bank);
+            ahPort = BankRegistration(bank);
         } catch (Exception e) {
             System.out.println("Bank does not exist.");
             System.exit(1);
@@ -32,12 +42,12 @@ public class AuctionHouseApplication {
         /** Accepts incoming client connections from agents */
         ServerSocket server;
         try {
-            server = new ServerSocket(port);
+            server = new ServerSocket(ahPort);
             while (true) {
                 System.out.println("Waiting for a connection");
                 Socket client = server.accept();
                 System.out.println("Client accepted!");
-                Thread thread = new Thread(new AHClientManager(client, bank, manager, port));
+                Thread thread = new Thread(new AHClientManager(client, bank, manager, ahPort));
                 thread.start();
             }
         } catch (IOException e) {
@@ -49,14 +59,14 @@ public class AuctionHouseApplication {
     /** Prompts user for port & if port not already in use by another AH,
      * register an account with bank where accountID is == port */
     private static int BankRegistration(Socket bank) {
-        int port = -1;
+        int ahPort = -1;
         DataOutputStream out;
         DataInputStream in;
         Scanner scanner = new Scanner(System.in);
 
         while(true) {
             System.out.println("Please Input Desired Port Number");
-            port = scanner.nextInt();
+            ahPort = scanner.nextInt();
 
             try {
                 // Request registration with the bank.
@@ -64,16 +74,16 @@ public class AuctionHouseApplication {
                 in = new DataInputStream(bank.getInputStream());
 
                 /** Action ClientType ClientId */
-                out.writeUTF("Register AuctionHouse " + port);
+                out.writeUTF("Register AuctionHouse " + ahPort);
 
                 // Check if Bank Approves this port number.
                 if(in.readUTF().equals("Registration successful")) {
                     System.out.println("Registration successful");
-                    return port;
+                    return ahPort;
                 }
                 else {
                     System.out.print("Port already in use, ");
-                    bank = new Socket("127.0.0.1", 1234);
+                    bank = new Socket(host, bankPort);
                 }
             } catch (Exception e) {
                 e.printStackTrace();

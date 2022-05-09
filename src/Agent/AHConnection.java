@@ -17,19 +17,21 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class AHConnection implements Runnable {
-    private String localHost;
-    private Integer port;
+    private String host;
+    private Integer ahPort;
+    private Integer bankPort;
     private Socket sockToAH;
     private Queue queue = new ConcurrentLinkedQueue<String>();
     private DataOutputStream outToAH;
     private DataInputStream inFromAH;
 
-    public AHConnection(String localHost, Integer port) {
-        this.localHost = localHost;
-        this.port = port;
+    public AHConnection(String host, Integer bankPort, Integer ahPort) {
+        this.host = host;
+        this.bankPort = bankPort;
+        this.ahPort = ahPort;
 
         try {
-            sockToAH = new Socket(localHost, port);
+            sockToAH = new Socket(host, ahPort);
             this.outToAH = new DataOutputStream(sockToAH.getOutputStream());
             this.inFromAH = new DataInputStream(sockToAH.getInputStream());
         } catch (IOException e) {
@@ -100,7 +102,7 @@ public class AHConnection implements Runnable {
     private void itemsResponse(String response) {
         // Do not want to import StringUtils
         System.out.println("------------------------AH ID: "
-                + port + "------------------------");
+                + ahPort + "------------------------");
         System.out.printf("%-15s %-15s %-15s %-15s\n", "ItemId", "Item Name", "Current Bid", "Time remaining");
         System.out.print(response);
         System.out.println("------------------------------" +
@@ -112,7 +114,7 @@ public class AHConnection implements Runnable {
      *  tell bank to finalize transaction and transfer funds from agent to AH */
     private void finalizeAuction(String itemId) {
         try {
-            Socket sockToBank = new Socket("127.0.0.1", 1234);
+            Socket sockToBank = new Socket(host, bankPort);
             DataOutputStream outToBank = new DataOutputStream(sockToBank.getOutputStream());
             DataInputStream inFromBank = new DataInputStream(sockToBank.getInputStream());
 
@@ -128,7 +130,7 @@ public class AHConnection implements Runnable {
     /** Close data streams and port when agent submits quit command to CL */
     public void terminateConnection() {
         try {
-            System.out.println("Terminating connection to AH #" + port);
+            System.out.println("Terminating connection to AH #" + ahPort);
             inFromAH.close();
             outToAH.close();
             sockToAH.close();

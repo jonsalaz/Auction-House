@@ -13,9 +13,11 @@ import java.net.Socket;
 public class BankApplication {
 
     private static BankManager bankManager;
+    private static Integer bankPort = 1234;
 
     public static void main(String[] args) {
         bankManager = new BankManager();
+        if (args.length == 1) bankPort = Integer.parseInt(args[0]);
         clientConnect();
     }
 
@@ -26,7 +28,7 @@ public class BankApplication {
 
                 while (true) {
 
-                    ServerSocket serverSocket = new ServerSocket(1234);
+                    ServerSocket serverSocket = new ServerSocket(bankPort);
                     System.out.println("\nServer waiting for connection");
                     Socket clientSocket = serverSocket.accept();
                     System.out.println("ACCEPTED CLIENT\n");
