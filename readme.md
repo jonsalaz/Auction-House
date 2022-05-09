@@ -16,22 +16,22 @@ houses or users are initialized in do not matter.
 
 To run the bank system use the following:
 
-<b>Default port:</b> ```java -jar <bank.jar>```
+<b>Default port:</b> ```java -jar bank.jar```
 
-<b>User provided port:</b> ```java -jar <bank.jar> portNumber```
+<b>User provided port:</b> ```java -jar bank.jar portNumber```
 
 To run the Auction House system use the following:
 
-<b>Default address & port:</b> ```java -jar <AH.jar>```
+<b>Default address & port:</b> ```java -jar AH.jar```
 
-<b>User provided address & port:</b> ```java -jar <AH.jar> IPAddress port```
+<b>User provided address & port:</b> ```java -jar AH.jar IPAddress port```
 
 
 To run the user use the following:
 
-<b>Default address & port:</b> ```java -jar <user.jar> clientUsername initialBalance```
+<b>Default address & port:</b> ```java -jar user.jar clientUsername initialBalance```
 
-<b>User provided address & port:</b> ```java -jar <AH.jar> clientUsername initialBalance IPAddress port```
+<b>User provided address & port:</b> ```java -jar AH.jar clientUsername initialBalance IPAddress port```
 
 
 ### Agent commands:
