@@ -82,7 +82,7 @@ public class AHManager {
     private void initializeAuctions() {
         this.auctions = new ArrayList<>();
         this.options = new ArrayList<>();
-        InputStream in = getClass().getResourceAsStream("items");
+        InputStream in = getClass().getResourceAsStream("/AuctionHouse/Items");
         BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 
         String[] splitLine = null;
