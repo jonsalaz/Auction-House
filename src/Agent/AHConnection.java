@@ -116,7 +116,7 @@ public class AHConnection implements Runnable {
      *  tell bank to finalize transaction and transfer funds from agent to AH */
     private void finalizeAuction(String itemId) {
         try {
-            Socket sockToBank = new Socket(ahHost, bankPort);
+            Socket sockToBank = new Socket(bankHost, bankPort);
             DataOutputStream outToBank = new DataOutputStream(sockToBank.getOutputStream());
             DataInputStream inFromBank = new DataInputStream(sockToBank.getInputStream());
 

@@ -8,6 +8,7 @@
 package AuctionHouse;
 
 import java.io.*;
+import java.net.InetAddress;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Random;
@@ -20,10 +21,14 @@ public class AHManager {
     private ScheduledExecutorService auctionTimer;
     private ArrayList<Auction> options;
 
+    private String bankHost;
+    private Integer bankPort;
     /** Creates initial auctions & responsibility of checking if
      * an auction has completed to separate thread, this allows
      * continuous condition checks on auction to decide if it's finished */
-    public AHManager() {
+    public AHManager(String bankHost, Integer bankPort) {
+        this.bankHost = bankHost;
+        this.bankPort = bankPort;
         initializeAuctions();
         this.auctionTimer = Executors.newSingleThreadScheduledExecutor();
         try {
@@ -134,7 +139,7 @@ public class AHManager {
      *  determine if bid is valid. If bid is valid communicate bid to bank,
      *  send first response to AHConnection that bid is accepted then
      *  second response stating auction was either won or outbid */
-    public void bidHandler(DataOutputStream out, String user, int id, long amount, int port) {
+    public void bidHandler(DataOutputStream out, String user, int id, long amount, String address) {
         //Search for auction with matching ID.
         for(Auction auction: auctions) {
             if(auction.getId() == id) {
@@ -142,11 +147,11 @@ public class AHManager {
                 if(auction.getCurrentBid() < amount) {
                     try {
                         //Connect with bank to make a request.
-                        Socket bank = new Socket("127.0.0.1", 1234);
+                        Socket bank = new Socket(bankHost, bankPort);
                         DataOutputStream outBank = new DataOutputStream(bank.getOutputStream());
                         DataInputStream inBank = new DataInputStream(bank.getInputStream());
                         // Bid request provided to bank.
-                        outBank.writeUTF("Bid " + user + " " + port + " " + id + " " + amount);
+                        outBank.writeUTF("Bid " + user + " " + address + " " + id + " " + amount);
                         //Bank response provided to user.
                         System.out.println("GETTING BANK STATUS " + user);
                         String status = inBank.readUTF();

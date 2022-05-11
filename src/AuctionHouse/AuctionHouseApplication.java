@@ -15,13 +15,13 @@ import java.util.Scanner;
 
 public class AuctionHouseApplication {
 
-    private static String host = "127.0.0.1";
+    private static String bankHost = "127.0.0.1";
     private static Integer bankPort = 1234;
 
     public static void main(String[] args) {
 
         if (args.length > 0) {
-            host = args[0];
+            bankHost = args[0];
             if (args.length == 2) bankPort = Integer.parseInt(args[1]);
         }
 
@@ -30,7 +30,7 @@ public class AuctionHouseApplication {
 
         // Register with the bank and request a port.
         try {
-            bank = new Socket(host, bankPort);
+            bank = new Socket(bankHost, bankPort);
             /** port = BankRegistration(bank); */
             ahPort = BankRegistration(bank);
         } catch (Exception e) {
@@ -38,7 +38,7 @@ public class AuctionHouseApplication {
             System.exit(1);
         }
 
-        AHManager manager = new AHManager();
+        AHManager manager = new AHManager(bankHost, bankPort);
 
         /** Accepts incoming client connections from agents */
         ServerSocket server;
@@ -48,7 +48,8 @@ public class AuctionHouseApplication {
                 System.out.println("Waiting for a connection");
                 Socket client = server.accept();
                 System.out.println("Client accepted!");
-                Thread thread = new Thread(new AHClientManager(client, bank, manager, ahPort));
+                Thread thread = new Thread(new AHClientManager(client, bank, manager,
+                        server.getInetAddress().getHostAddress() + ":" + ahPort));
                 thread.start();
             }
         } catch (IOException e) {
@@ -84,7 +85,7 @@ public class AuctionHouseApplication {
                 }
                 else {
                     System.out.print("Port already in use, ");
-                    bank = new Socket(host, bankPort);
+                    bank = new Socket(bankHost, bankPort);
                 }
             } catch (Exception e) {
                 e.printStackTrace();

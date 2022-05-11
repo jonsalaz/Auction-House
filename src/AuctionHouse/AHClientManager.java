@@ -16,9 +16,9 @@ public class AHClientManager implements Runnable {
     private Socket client;
     private Socket bank;
     private AHManager manager;
-    private int port;
-    public AHClientManager(Socket client, Socket bank, AHManager manager, int port) {
-        this.port = port;
+    private String address;
+    public AHClientManager(Socket client, Socket bank, AHManager manager, String address) {
+        this.address = address;
         this.client = client;
         this.bank = bank;
         this.manager = manager;
@@ -46,7 +46,7 @@ public class AHClientManager implements Runnable {
                     case("bid"):
                         // bid user itemID amount
                         out = new DataOutputStream(client.getOutputStream());
-                        manager.bidHandler(out, details[1], Integer.parseInt(details[2]), Long.parseLong(details[3]), port);
+                        manager.bidHandler(out, details[1], Integer.parseInt(details[2]), Long.parseLong(details[3]), address);
                         break;
                     //Request to disconnect from auction house.
                     case("quit"):
