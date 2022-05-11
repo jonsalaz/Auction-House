@@ -18,7 +18,7 @@ import java.util.Scanner;
 public class AgentApplication {
     private static String clientUsername;
     private static String initBalance;
-    private static String host = "127.0.0.1";
+    private static String bankHost = "127.0.0.1";
     private static Integer bankPort = 1234;
 
     private static Scanner scanner = new Scanner(System.in);
@@ -30,7 +30,7 @@ public class AgentApplication {
         initBalance = args[1];
 
         if (args.length > 2) {
-            host = args[2];
+            bankHost = args[2];
             if (args.length == 4) bankPort = Integer.parseInt(args[3]);
         }
 
@@ -71,7 +71,7 @@ public class AgentApplication {
      * CLA specified agent username & initial balance */
     private static void registerWithBank() {
         try {
-            Socket sockToBank = new Socket(host, bankPort);
+            Socket sockToBank = new Socket(bankHost, bankPort);
             DataOutputStream outToServer = new DataOutputStream(sockToBank.getOutputStream());
             DataInputStream inFromServer = new DataInputStream(sockToBank.getInputStream());
 
@@ -100,7 +100,7 @@ public class AgentApplication {
     /** Retrieve a list of AH ports from bank & establish AH connection */
     private static void getAuctionHousesFromBank() {
         try {
-            Socket sockToBank = new Socket(host, bankPort);
+            Socket sockToBank = new Socket(bankHost, bankPort);
             DataOutputStream outToServer = new DataOutputStream(sockToBank.getOutputStream());
             DataInputStream inFromServer = new DataInputStream(sockToBank.getInputStream());
 
@@ -137,12 +137,12 @@ public class AgentApplication {
 
         for (String strAdd : addresses) {
 
-            String addPort[] = strAdd.split(":");
-            String address = addPort[0];
+            String[] addPort = strAdd.split(":");
+            String ahHost = addPort[0];
             Integer ahPort = Integer.valueOf(addPort[1]);
             if (!connectedAHs.containsKey(ahPort)) {
                 try {
-                    AHConnection newConnection = new AHConnection(address, bankPort, ahPort);
+                    AHConnection newConnection = new AHConnection(ahHost, ahPort, bankHost, bankPort);
                     connectedAHs.put(ahPort, newConnection);
                     newConnection.run();
                     System.out.println("Established connection with Auction House #" + ahPort);

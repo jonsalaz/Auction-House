@@ -75,7 +75,7 @@ public class AuctionHouseApplication {
                 in = new DataInputStream(bank.getInputStream());
 
                 /** Action ClientType ClientId */
-                out.writeUTF("Register AuctionHouse " + InetAddress.getLocalHost() + ":" +ahPort);
+                out.writeUTF("Register AuctionHouse " + InetAddress.getLocalHost().getHostAddress() + ":" + ahPort);
 
                 // Check if Bank Approves this port number.
                 if(in.readUTF().equals("Registration successful")) {

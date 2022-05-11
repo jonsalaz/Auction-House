@@ -47,7 +47,7 @@ public class BankManager {
     private HashMap<String, Long> accounts = new HashMap<>();
     /** funds held until auction won, (K: item id, V: TransactionAccounts) */
     private HashMap<String, Transaction> bidsInEscrow = new HashMap<>();
-    private List<Integer> auctionHousePorts = new ArrayList<>();
+    private List<String> auctionHousePorts = new ArrayList<>();
 
     /** Provided socket by BankClientManager thread, parse client instruction & call appropriate request
      * handler function */
@@ -103,7 +103,7 @@ public class BankManager {
             if (clientType.equals("AuctionHouse")) {
                 System.out.println("Registering AH");
                 accounts.put(clientId, 0L);
-                auctionHousePorts.add(Integer.valueOf(clientId));
+                auctionHousePorts.add(clientId);
                 outputStream.writeUTF("Registration successful");
             }
             else if (clientType.equals("Agent")) {
@@ -228,10 +228,10 @@ public class BankManager {
         String portString = "";
 
         if (auctionHousePorts.size() <= 1) {
-            for (Integer i : auctionHousePorts) portString += i;
+            for (String i : auctionHousePorts) portString += i;
         }
         else {
-            for (Integer i : auctionHousePorts) {
+            for (String i : auctionHousePorts) {
                 portString += i + "-";
 
             }

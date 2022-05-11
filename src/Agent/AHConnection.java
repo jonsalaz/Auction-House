@@ -17,21 +17,23 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class AHConnection implements Runnable {
-    private String host;
+    private String ahHost;
     private Integer ahPort;
     private Integer bankPort;
     private Socket sockToAH;
     private Queue queue = new ConcurrentLinkedQueue<String>();
     private DataOutputStream outToAH;
     private DataInputStream inFromAH;
+    private String bankHost;
 
-    public AHConnection(String host, Integer bankPort, Integer ahPort) {
-        this.host = host;
-        this.bankPort = bankPort;
+    public AHConnection(String ahHost, Integer ahPort, String bankHost, Integer bankPort) {
+        this.ahHost = ahHost;
         this.ahPort = ahPort;
+        this.bankHost = bankHost;
+        this.bankPort = bankPort;
 
         try {
-            sockToAH = new Socket(host, ahPort);
+            sockToAH = new Socket(ahHost, ahPort);
             this.outToAH = new DataOutputStream(sockToAH.getOutputStream());
             this.inFromAH = new DataInputStream(sockToAH.getInputStream());
         } catch (IOException e) {
@@ -114,7 +116,7 @@ public class AHConnection implements Runnable {
      *  tell bank to finalize transaction and transfer funds from agent to AH */
     private void finalizeAuction(String itemId) {
         try {
-            Socket sockToBank = new Socket(host, bankPort);
+            Socket sockToBank = new Socket(ahHost, bankPort);
             DataOutputStream outToBank = new DataOutputStream(sockToBank.getOutputStream());
             DataInputStream inFromBank = new DataInputStream(sockToBank.getInputStream());
 
