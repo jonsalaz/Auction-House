@@ -124,21 +124,25 @@ public class AgentApplication {
         }
 
         String[] clientQuery = query.split(" ");
-        String portString = clientQuery[1];
-        String[] ahPorts;
+        String addressString = clientQuery[1];
+        String[] addresses;
 
-        if (portString.contains("-"))  ahPorts = portString.split("-");
+        if (addressString.contains("-"))  addresses = addressString.split("-");
+
         else {
             // if only one port exists
-            ahPorts = new String[1];
-            ahPorts[0] = portString;
+            addresses = new String[1];
+            addresses[0] = addressString;
         }
 
-        for (String strPort : ahPorts) {
-            Integer ahPort = Integer.valueOf(strPort);
+        for (String strAdd : addresses) {
+
+            String addPort[] = strAdd.split(":");
+            String address = addPort[0];
+            Integer ahPort = Integer.valueOf(addPort[1]);
             if (!connectedAHs.containsKey(ahPort)) {
                 try {
-                    AHConnection newConnection = new AHConnection(host, bankPort, ahPort);
+                    AHConnection newConnection = new AHConnection(address, bankPort, ahPort);
                     connectedAHs.put(ahPort, newConnection);
                     newConnection.run();
                     System.out.println("Established connection with Auction House #" + ahPort);
