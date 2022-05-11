@@ -8,6 +8,7 @@
 package AuctionHouse;
 
 import java.io.*;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Scanner;
@@ -42,7 +43,7 @@ public class AuctionHouseApplication {
         /** Accepts incoming client connections from agents */
         ServerSocket server;
         try {
-            server = new ServerSocket(ahPort);
+            server = new ServerSocket(ahPort, 0, InetAddress.getLocalHost());
             while (true) {
                 System.out.println("Waiting for a connection");
                 Socket client = server.accept();
@@ -74,7 +75,7 @@ public class AuctionHouseApplication {
                 in = new DataInputStream(bank.getInputStream());
 
                 /** Action ClientType ClientId */
-                out.writeUTF("Register AuctionHouse " + ahPort);
+                out.writeUTF("Register AuctionHouse " + InetAddress.getLocalHost() + ":" +ahPort);
 
                 // Check if Bank Approves this port number.
                 if(in.readUTF().equals("Registration successful")) {

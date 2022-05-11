@@ -7,8 +7,11 @@
 package Bank;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketAddress;
+import java.util.Arrays;
 
 public class BankApplication {
 
@@ -28,7 +31,8 @@ public class BankApplication {
 
                 while (true) {
 
-                    ServerSocket serverSocket = new ServerSocket(bankPort);
+                    ServerSocket serverSocket = new ServerSocket(bankPort, 0, InetAddress.getLocalHost());
+                    System.out.println("Bank started on: " + serverSocket.getInetAddress().getHostAddress());
                     System.out.println("\nServer waiting for connection");
                     Socket clientSocket = serverSocket.accept();
                     System.out.println("ACCEPTED CLIENT\n");
@@ -38,7 +42,6 @@ public class BankApplication {
 
                     serverSocket.close();
                 }
-
             } catch (IOException e) {
                 e.printStackTrace();
             }
