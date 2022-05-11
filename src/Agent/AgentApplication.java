@@ -57,6 +57,7 @@ public class AgentApplication {
                 }
                 case ("items"): {
                     getItemsFromAHs();
+                    break;
                 }
                 default:
                     System.out.println("Invalid command");
